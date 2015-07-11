@@ -1,0 +1,21 @@
+//
+// ITEM LIST
+// --------------------------------------------------
+// Handles the styling of child pages by levels
+//
+@levelsToGenerate: 7;
+@secondLevelPrefix: "\2015\0020";
+@subsequentLevelPrefixes: "\2015\0020";
+
+.items-list {
+	.levels (@index, @prefix: "") when (@index < @levelsToGenerate) {
+		
+		.level-@{index} a:before {
+			content: "@{prefix}@{secondLevelPrefix}";
+		}
+		
+		.levels(@index + 1, "@{prefix}@{subsequentLevelPrefixes}");
+	}
+	
+	.levels(1);
+}

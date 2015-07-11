@@ -54,8 +54,10 @@ exports = module.exports = function(req, res) {
 	}
 
 	var renderView = function() {
-
-		var query = req.list.paginate({ filters: queryFilters, page: req.params.page, perPage: req.list.get('perPage') }).sort(sort.by);
+		var viewFilters = { filters: queryFilters, page: req.params.page, perPage: req.list.get('perPage'), outputNested: false };
+		var query = sort.by === 'ParentChild' ? 
+			req.list.groupParent(viewFilters) :
+			req.list.paginate(viewFilters).sort(sort.by);
 
 		req.list.selectColumns(query, columns);
 
