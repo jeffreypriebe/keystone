@@ -60,7 +60,7 @@ cloudinaryimages.prototype.addToSchema = function() {
 
 	var field = this,
 		schema = this.list.schema;
-
+	
 	this.paths = {
 		// virtuals
 		folder: 		this._path.append('.folder'),
@@ -318,9 +318,17 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 				tags: [tp + field.list.path + '_' + field.path, tp + field.list.path + '_' + field.path + '_' + item.id]
 			};
 
+			var uploadFolder = []
 			if (keystone.get('cloudinary folders')) {
-				uploadOptions.folder = item.get(paths.folder);
+				uploadFolder.push(item.get(paths.folder));
 			}
+			
+			if (keystone.get('cloudinary folders use item name')) {
+				uploadFolder.push(item.get("name"));
+			}
+			
+			if (!_.isEmpty(uploadFolder))
+				uploadOptions.folder = uploadFolder.join('/');
 
 			if (keystone.get('cloudinary prefix')) {
 				uploadOptions.tags.push(keystone.get('cloudinary prefix'));
