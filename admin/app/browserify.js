@@ -3,6 +3,7 @@ var browserify = require('browserify');
 var chalk = require('chalk');
 var crypto = require('crypto');
 var moment = require('moment');
+var _ = require('underscore');
 var packages = require('../packages');
 var path = require('path');
 var watchify = require('watchify');
@@ -26,7 +27,7 @@ function logError(file, err) {
 	console.log(ts() + chalk.red('error building ' + chalk.underline(file) + ':') + '\n' + err.message);
 }
 
-module.exports = function(file, name) {
+module.exports = function(file, name, addOpts) {
 	var b;
 	var building = false;
 	var queue = [];
@@ -36,6 +37,8 @@ module.exports = function(file, name) {
 		if (building) return;
 		building = true;
 		var opts = { basedir: basedir };
+		if (addOpts)
+			_.extend(opts, addOpts);
 		if (devMode) {
 			logInit(file);
 			opts.cache = {};
@@ -43,12 +46,13 @@ module.exports = function(file, name) {
 		}
 		if (name) {
 			b = browserify(opts);
+			_.extend(opts, { expose: name });
 			b.require('./' + file, { expose: name });
 		} else {
 			b = browserify('./' + file, opts);
 		}
 		b.transform(babelify.configure({
-			ignore: ['**/lib/**'],
+			//ignore: ['**/lib/**'],
 			plugins: [require('babel-plugin-object-assign')]
 		}));
 		b.exclude('FieldTypes');
