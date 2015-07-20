@@ -1,0 +1,8 @@
+extends ../layout/base-plugin-frame
+
+block js
+	script(src='/keystone/js/tiny-mce-plugins/#{plugin}.js')
+
+block content
+	// Attach point for new React View
+	div#plugin-view
