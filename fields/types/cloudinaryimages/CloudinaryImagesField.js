@@ -158,6 +158,9 @@ module.exports = Field.create({
 	},
 
 	renderToolbar: function() {
+		if(this.props.canUpload === false)
+			return;
+		
 		var body = [];
 
 		var push = function (queueType, alertType, count, action) {

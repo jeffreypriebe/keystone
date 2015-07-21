@@ -38,6 +38,7 @@ var View = React.createClass({
 			folderPath: this.props.listPath + ': '  + this.props.itemName,
 			folders: [],
 			props: {
+				canUpload: true,
 				paths: {}
 			},
 			itemData: null
@@ -53,23 +54,41 @@ var View = React.createClass({
 			this.loadData();
 	},
 	
-	updateValuesState: function(values) {
+	updateState: function(obj) {
 		if(this.isMounted())
-			this.setState(
-				_.extend(this.state, {
-					props: { paths: this.state.props.paths, value: values }
-				})
-			);
+			this.setState(_.extend(this.state, obj));
+	},
+	
+	updatePropsState: function(paths, values, canUpload) {
+		paths = paths || this.state.props.paths;
+		values = values || this.state.props.values;
+		if(arguments.length < 3)
+			canUpload = this.state.props.canUpload;
+		
+		var newProps = { props: {
+			paths: paths,
+			value: values,
+			canUpload: canUpload
+		}};
+		
+		this.updateState(newProps);
+	},
+	
+	updateValuesState: function(values) {
+		this.updatePropsState(null, values);
 	},
 	
 	loadData: function() {
+		var newCanUpload = true;
 		if (!this.state.folderPath || (this.state.folderPath === '/' && !this.state.folderId)) {
+			newCanUpload = false;
 			this.listAllFolders(); //top-level
 		} else if (!this.state.folderId) {
 			this.loadFolderFromPath(); //first load only, really
 		} else {
 			this.loadFolderData(this.state.folderId); //loading a folder that user clicked on
 		}
+		this.updatePropsState(null, null, newCanUpload);
 	},
 	
 	listAllFolders: function() {
@@ -169,12 +188,18 @@ var View = React.createClass({
 		return React.createElement(Thumbnail, this.state.props);
 	},
 	
+	renderEmptySpacer: function() {
+		if (_.isEmpty(this.state.folders) && _.isEmpty(this.state.props.value))
+			return <div className="folders folders-empty" />	
+	},
+	
 	render: function() {
 		if(!this.state.props.value) return <div><p>Loading&#8230;</p></div>;
 		return (
 			<div>
 			{this.renderFolderPath()}
 			{this.renderFolders()}
+			{this.renderEmptySpacer()}
 			{this.renderThumbnails()}
 			</div>
 		);
