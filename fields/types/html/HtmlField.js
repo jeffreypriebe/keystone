@@ -34,6 +34,7 @@ module.exports = Field.create({
 		};
 
 		this._currentValue = this.props.value;
+		//opts gets passed through to editor.settings
 		tinymce.init(opts);
 	},
 
@@ -141,6 +142,12 @@ module.exports = Field.create({
 			menubar:  options.menubar || false,
 			skin:     options.skin || 'keystone'
 		};
+		
+		if (options.additionalButtons.indexOf('cloudinarybrowser') !== -1) {
+			opts.modelName = options.cloudinaryBrowserModel;
+			opts.listPath = this.props.list.key;
+			opts.itemName = this.props.data.name;
+		}
 
 		if (this.shouldRenderField()) {
 			opts.uploadimage_form_url = '/keystone/api/cloudinary/upload';

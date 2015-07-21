@@ -1,8 +1,11 @@
 extends ../layout/base-plugin-frame
 
+block css
+	link(rel="stylesheet", href="/keystone/styles/tiny-mce-plugins/#{plugin}/style.min.css")
+
 block js
 	script(src='/keystone/js/tiny-mce-plugins/#{plugin}.js')
 
 block content
 	// Attach point for new React View
-	div#plugin-view
+	div#plugin-view(modelName="#{modelName}" listPath="#{listPath}" itemName="#{itemName}")

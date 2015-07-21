@@ -22,6 +22,8 @@ var EditForm = React.createClass({
 		props.values = this.state.values;
 		props.onChange = this.handleChange;
 		props.mode = 'edit';
+		props.data = this.props.data;
+		props.list = this.props.list;
 		return props;
 	},
 	
