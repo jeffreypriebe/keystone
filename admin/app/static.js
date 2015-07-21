@@ -15,14 +15,16 @@ var router = express.Router();
 
 /* Browersify all Tiny-MCE React-based plugins */
 
-var pluckPluginName = /tinymce\/plugins\/([^\/]+)\/renderPlugin.js$/i;
-var tinyPlugins = glob.sync(__dirname + '/../public/js/lib/tinymce/plugins/**/renderPlugin.js')
+var pluckPluginName = /(.*tinymce\/plugins\/([^\/]+)\/)renderPlugin.js$/i;
+var basePluginFolder = '/../public/js/lib/tinymce/plugins/';
+var tinyPlugins = glob.sync(__dirname + basePluginFolder + '**/renderPlugin.js')
 	.map(function(file) {
 		var nameMatch = pluckPluginName.exec(file);
 		if (!nameMatch) throw new Error('Unexpected name format for TinyMCE plugin ' + file); 
 		return {
 			file: path.relative(__dirname, file).replace(/\\/g, '/'),
-			name: nameMatch[1]
+			path: nameMatch[1],
+			name: nameMatch[2]
 		};
 	});
 
@@ -65,6 +67,10 @@ router.get('/js/fields.js', bundles.fields.serve);
 router.get('/js/home.js', bundles.home.serve);
 router.get('/js/item.js', bundles.item.serve);
 router.get('/js/list.js', bundles.list.serve);
-tinyPlugins.forEach(function(p) { router.get('/js/tiny-mce-plugins/' + p.name + '.js', bundles[p.name].serve); });
+tinyPlugins.forEach(function(p) {
+	router.get('/js/tiny-mce-plugins/' + p.name + '.js', bundles[p.name].serve);
+	router.use('/styles/tiny-mce-plugins/' + p.name, less(p.path, lessOptions));
+});
+router.use('/styles/tiny-mce-plugins/', express.static(__dirname + basePluginFolder));
 
 module.exports = router;
