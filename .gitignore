@@ -29,4 +29,6 @@ admin/public/styles/auth.min.css
 admin/public/styles/keystone.css
 admin/public/styles/keystone.min.css
 
+admin/public/**/*.min.css
+
 launch.json
