@@ -53,15 +53,28 @@ var Thumbnail = React.createClass({
 
 module.exports = Field.create({
 
-	getInitialState: function() {
-		var thumbnails = [];
+	getInitialState: function() {		
+		var thumbnails = this.processThumbnails(this.props.value);
+
+		return { thumbnails: thumbnails };
+	},
+	
+	componentDidUpdate: function(prevProps, prevState) {
+		if(prevProps.value !== this.props.value) {
+			var thumbnails = this.processThumbnails(this.props.value);
+			this.setState({ thumbnails: thumbnails });
+		}
+	},
+	
+	processThumbnails(thumbs) {
 		var self = this;
+		var thumbnails = [];
 
 		_.each(this.props.value, function (item) {
 			self.pushThumbnail(item, thumbnails);
 		});
-
-		return { thumbnails: thumbnails };
+		
+		return thumbnails;
 	},
 
 	removeThumbnail: function (i) {
