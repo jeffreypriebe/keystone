@@ -15,6 +15,7 @@
     "babel-plugin-object-assign": "^1.2.1",
     "babelify": "^6.3.0",
     "babyparse": "^0.4.3",
+    "base64-stream": "^0.1.2",
     "bcrypt-nodejs": "~0.0.3",
     "blacklist": "^1.1.2",
     "bluebird": "^2.10.2",

@@ -8,7 +8,9 @@ var _ = require('underscore'),
 	cloudinary = require('cloudinary'),
 	utils = require('keystone-utils'),
 	super_ = require('../Type'),
-	async = require('async');
+	async = require('async'),
+	Stream = require('stream'),
+	base64Stream = require('base64-stream');
 
 /**
  * CloudinaryImages FieldType Constructor
@@ -305,8 +307,11 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 		}
 
 		// Upload Data (form submissions)
-		if (req.files && req.files[paths.upload]) {
-			var files = [].concat(req.files[paths.upload]);
+		var filesAt = req.files[paths.upload];
+		if(!filesAt && req.body[paths.upload])
+			filesAt = JSON.parse(req.body[paths.upload]);
+		if (req.files && filesAt) {
+			var files = [].concat(filesAt);
 
 			var tp = keystone.get('cloudinary prefix') || '';
 
@@ -345,18 +350,32 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 
 				if (field.options.filenameAsPublicID) {
 					uploadOptions.public_id = file.originalname.substring(0, file.originalname.lastIndexOf('.'));
-				} else {
-					uploadOptions = undefined;
-				}
+				} 
 
-				cloudinary.uploader.upload(file.path, function(result) {
+				if (!file.path && !file.data) return next();
+				
+				var cloudinaryResultHandler = function(result) {
 					if (result.error) {
 						return next(result.error);
 					} else {
 						item.get(field.path).push(result);
 						return next();
 					}
-				}, uploadOptions);
+				};
+				
+				if(file.path)
+					cloudinary.uploader.upload(file.path, cloudinaryResultHandler, uploadOptions);
+				else if(file.data) {
+					var dataStream = new Stream.Readable();
+					dataStream._read = function() {};
+					dataStream.push(file.data);
+					dataStream.push(null);
+					
+					var cloudinaryStream = cloudinary.uploader.upload_stream(cloudinaryResultHandler, uploadOptions);
+					
+					dataStream.pipe(base64Stream.decode()).
+						pipe(cloudinaryStream);						
+				}
 
 			}, function(err) {
 				return callback(err);
