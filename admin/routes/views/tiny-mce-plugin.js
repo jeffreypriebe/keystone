@@ -9,6 +9,7 @@ exports = module.exports = function(req, res) {
 		page: 'tiny-mce-plugin',
 		title: appName + ': tiny MCE plugin: ' + req.params.plugin,
 		modelName: req.query.modelName,
+		fieldName: req.query.fieldName,
 		listPath: req.query.listPath,
 		itemName: req.query.itemName,
 		plugin: req.params.plugin

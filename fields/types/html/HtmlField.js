@@ -145,6 +145,7 @@ module.exports = Field.create({
 		
 		if (options.additionalButtons.indexOf('cloudinarybrowser') !== -1) {
 			opts.modelName = options.cloudinaryBrowserModel;
+			opts.fieldName = options.cloudinaryBrowserField;
 			opts.listPath = this.props.list.key;
 			opts.itemName = this.props.data.name;
 		}

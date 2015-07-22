@@ -39,8 +39,8 @@ var View = React.createClass({
 				canUpload: true,
 				buttonSuffix: ' to upload',
 				paths: {
-					action: 'images_action',
-					uploads: 'images_uploads'
+					action: this.props.fieldName + '_action',
+					uploads: this.props.fieldName + '_uploads'
 				}
 			},
 			itemData: null
@@ -121,7 +121,7 @@ var View = React.createClass({
 		request.get('/keystone/api/' + this.props.modelName + '/autocomplete?q=' + this.state.folderPath)
 			.set('Accept', 'application/json')
 			.end((err, res) => {
-				if (err || !res.ok || !res.body) {// || !res.body.fields || !res.body.fields['images']) {
+				if (err || !res.ok || !res.body) {
 					// TODO: nicer error handling
 					console.log('Error loading item data:', res ? res.text : err);
 					alert('Error loading data (details logged to console)');
@@ -151,12 +151,12 @@ var View = React.createClass({
 					return;
 				}
 				
-				if(!res.body.fields['images']) {
+				if(!res.body.fields[this.props.fieldName]) {
 					this.updateValueState([]);
 					return; //Folder doesn't have any images
 				}
 						
-				this.updateValueState(res.body.fields['images']);
+				this.updateValueState(res.body.fields[this.props.fieldName]);
 			});		
 	},
 	
@@ -198,10 +198,10 @@ var View = React.createClass({
 		
 		var postObj = {
 			action: 'updateItem',
-			images_upload: JSON.stringify(newThumbs),
 			csrf_query: Keystone.csrf_query,
 			q: Keystone.query
 		};
+		postObj[this.props.fieldName + '_upload'] = JSON.stringify(newThumbs);
 		
 		var postData = Keystone.csrf(postObj);
 		var req = request.post('/keystone/' + this.props.modelName + '/' + this.state.folderId)
@@ -268,6 +268,7 @@ var View = React.createClass({
 
 var pluginEl = document.getElementById('plugin-view');
 var modelName = pluginEl.getAttribute('modelName');
+var fieldName = pluginEl.getAttribute('fieldName');
 var listPath = pluginEl.getAttribute('listPath');
 var itemName = pluginEl.getAttribute('itemName');
-React.render(<View modelName={modelName} listPath={listPath} itemName={itemName} />, pluginEl);
+React.render(<View modelName={modelName} fieldName={fieldName} listPath={listPath} itemName={itemName} />, pluginEl);
