@@ -9,6 +9,7 @@ var Thumbnail = React.createClass({
 	displayName: 'CloudinaryImagesField',
 	
 	render: function() {
+		var self = this;
 		var iconClassName, imageDetails;
 
 		if (this.props.deleted) {
@@ -27,18 +28,24 @@ var Thumbnail = React.createClass({
 
 		var actionLabel = this.props.deleted ? 'Undo' : 'Remove';
 
-		if (!this.props.isQueued) {
+		if (!this.props.isQueued && this.props.allowRemoval) {
 			imageDetails = (
 				<div className='image-details'>
 					<button onClick={this.props.toggleDelete} type='button' className='btn btn-link btn-cancel btn-undo-remove'>{actionLabel}</button>
 				</div>
 			);
 		}
+		
+		var url = !this.props.imageClick ? this.props.url : '#'
+		
+		var linkClick = this.props.imageClick
+			? this.props.imageClick.bind(this, self)
+			: null;
 
 		return (
 			<div className='image-field image-sortable row col-sm-3 col-md-12' title={title}> 
 				<div className={previewClassName}> 
-					<a href={this.props.url} className='img-thumbnail'>
+					<a href={url} onClick={linkClick} className='img-thumbnail'> 
 						<img style={{ height: '90' }} className='img-load' src={this.props.url} />
 						<span className={iconClassName} />
 					</a>
@@ -96,7 +103,8 @@ module.exports = Field.create({
 		thumbs = thumbs || this.state.thumbnails;
 		var i = thumbs.length;
 		args.toggleDelete = this.removeThumbnail.bind(this, i);
-		thumbs.push(<Thumbnail key={i} {...args} />);
+		var allowRemoval = this.props.allowRemoval === null ? true : this.props.allowRemoval;
+		thumbs.push(<Thumbnail key={i} allowRemoval={allowRemoval} imageClick={this.props.imageClick} {...args} />);
 	},
 
 	fileFieldNode: function() {
