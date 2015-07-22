@@ -1,6 +1,7 @@
 var React = require('react');
 var request = require('superagent');
 var _ = require('underscore');
+var InsertModal = require('./insertModal');
 
 var Thumbnail = require('../../../../../../../fields/types/cloudinaryimages/CloudinaryImagesField.js');
 
@@ -35,8 +36,11 @@ var View = React.createClass({
 		return {
 			folderPath: '/',
 			folders: [],
+			insertModalProps: {},
 			props: {
 				canUpload: true,
+				allowRemoval: false,
+				imageClick: this.thumbnailClicked,
 				buttonSuffix: ' to upload',
 				paths: {
 					action: this.props.fieldName + '_action',
@@ -66,17 +70,12 @@ var View = React.createClass({
 	},
 	
 	updatePropsState: function(paths, value, canUpload) {
-		paths = paths || this.state.props.paths;
-		value = value || this.state.props.value;
-		if(arguments.length < 3)
-			canUpload = this.state.props.canUpload;
 		
-		var newProps = { props: {
-			buttonSuffix: this.state.props.buttonSuffix,
-			paths: paths,
-			value: value,
-			canUpload: canUpload
-		}};
+		var newProps = _.extend(this.state.props, {
+			paths: paths || this.state.props.paths,
+			value: value || this.state.props.value,
+			canUpload: canUpload !== undefined ? canUpload : this.state.props.canUpload
+		});
 		
 		this.updateState(newProps);
 	},
@@ -173,6 +172,10 @@ var View = React.createClass({
 		this.setState({ folderPath: '/', folderId: null }); //Single level of foldering, so "up" is always, return to root
 	},
 	
+	thumbnailClicked: function(thumb, e) {
+		this.refs.insertModal.show();
+	},
+	
 	thumbnailUpdate: function(prevProps, props, prevState, state) {
 		//thumbnail manages itself on the state.thumbnails - but we have only the props.value that we passed in, that's why we are comparing to see if these changes
 		if(state.thumbnails.length !== this.state.childFileCount)
@@ -260,6 +263,7 @@ var View = React.createClass({
 			<form onSubmit={this.postThumbnails} encType="multipart/form-data">
 				{this.renderThumbnails()}
 			</form>
+			<InsertModal ref='insertModal' {...this.state.insertModalProps} />
 			</div>
 		);
 	}
