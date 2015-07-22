@@ -34,7 +34,7 @@ var View = React.createClass({
 	
 	getInitialState: function() {
 		return {
-			folderPath: '/',
+			folderPath: 'Image Folder 1',//'/',
 			folders: [],
 			insertModalProps: {},
 			props: {

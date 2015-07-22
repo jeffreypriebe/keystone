@@ -3,6 +3,7 @@ var elemental = require('elemental'),
 	Button = elemental.Button,
 	FormField = elemental.FormField,
 	FormInput = elemental.FormInput,
+	FormRow = elemental.FormRow,
 	Modal = elemental.Modal,
 	ModalHeader = elemental.ModalHeader,
 	ModalBody = elemental.ModalBody,
@@ -15,9 +16,11 @@ module.exports = React.createClass({
 	getInitialState() {
 		return {
 			formProcessing: false,
-			isOpen: false,
+			isOpen: true, //false,
 			email: '',
-			password: ''
+			password: '',
+			
+			//defaultDescription: this.
 		};
 	},
 	
@@ -40,13 +43,24 @@ module.exports = React.createClass({
 		return (
 			<Modal isOpen={this.state.isOpen} onCancel={this.toggleModal} backdropClosesModal>
 				<ModalHeader text="Insert Image" showCloseButton onClose={this.toggleModal} />
-				<form action="#" onSubmit={this.submitForm} noValidate>
+				<form className="horizontal-form" action="#" onSubmit={this.submitForm} noValidate>
 					<ModalBody>
-						<FormField label="Email">
-							<FormInput label="Email" type="email" name="email" ref="email" value={this.state.email} required />
+						<FormField label="File">
+							<div>Filename here</div>
 						</FormField>
-						<FormField label="Password">
-							<FormInput label="Password" type="password" name="password" ref="password" value={this.state.password} required />
+						<FormField label="Description">
+							<FormInput label="Description" type="text" name="description" ref="description" placeholder={this.state.defaultDescription} required size="sm" />
+						</FormField>
+						<FormField label="Size">
+							<FormRow>
+								<FormField label="Width">
+									<FormInput label="Width" pattern="[0-9]+" name="width" ref="width" />
+								</FormField>
+								<div className="form-field size-x">x</div>
+								<FormField label="Height">
+									<FormInput label="Height" pattern="[0-9]+" name="height" ref="height" />
+								</FormField>
+							</FormRow>
 						</FormField>
 					</ModalBody>
 					<ModalFooter>
