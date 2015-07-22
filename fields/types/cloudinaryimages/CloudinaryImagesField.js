@@ -204,7 +204,7 @@ module.exports = Field.create({
 		return (
 			<div className='images-toolbar row col-sm-3 col-md-12'>
 				<div className='pull-left'>
-					<button type='button' className='btn btn-default btn-upload' onClick={this.changeImage}>Select files</button>
+					<button type='button' className='btn btn-default btn-upload' onClick={this.changeImage}>Select files{this.props.buttonSuffix}</button>
 					{clearFilesButton}
 				</div>
 				{body}
