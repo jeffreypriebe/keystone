@@ -33,10 +33,11 @@ var View = React.createClass({
 	
 	getInitialState: function() {
 		return {
-			folderPath: this.props.listPath + ': '  + this.props.itemName,
+			folderPath: '/',
 			folders: [],
 			props: {
 				canUpload: true,
+				buttonSuffix: ' to upload',
 				paths: {
 					action: 'images_action',
 					uploads: 'images_uploads'
@@ -71,6 +72,7 @@ var View = React.createClass({
 			canUpload = this.state.props.canUpload;
 		
 		var newProps = { props: {
+			buttonSuffix: this.state.props.buttonSuffix,
 			paths: paths,
 			value: value,
 			canUpload: canUpload
