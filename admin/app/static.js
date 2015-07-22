@@ -63,6 +63,8 @@ var lessOptions = {
 
 router.use('/styles', less(__dirname + '../../public/styles', lessOptions));
 router.use(express.static(__dirname + '../../public'));
+router.use('/styles/elemental', less(__dirname + '/../../node_modules/elemental/less', lessOptions));
+router.use('/styles/elemental/', express.static(__dirname + '/../../node_modules/elemental/less'));
 router.get('/js/fields.js', bundles.fields.serve);
 router.get('/js/home.js', bundles.home.serve);
 router.get('/js/item.js', bundles.item.serve);
