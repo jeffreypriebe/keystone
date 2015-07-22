@@ -56,14 +56,16 @@ module.exports = Field.create({
 	getInitialState: function() {		
 		var thumbnails = this.processThumbnails(this.props.value);
 
-		return { thumbnails: thumbnails };
+		return { files: [], thumbnails: thumbnails };
 	},
 	
 	componentDidUpdate: function(prevProps, prevState) {
 		if(prevProps.value !== this.props.value) {
 			var thumbnails = this.processThumbnails(this.props.value);
-			this.setState({ thumbnails: thumbnails });
+			this.setState(_.extend(this.state, { thumbnails: thumbnails }));
 		}
+		if (this.props.cb && typeof this.props.cb === 'function')
+			this.props.cb(prevProps, this.props, prevState, this.state);
 	},
 	
 	processThumbnails(thumbs) {
@@ -87,7 +89,7 @@ module.exports = Field.create({
 			thumb.props.deleted = !thumb.props.deleted;
 		}
 
-		this.setState({ thumbnails: thumbs });
+		this.setState(_.extend(this.state, { thumbnails: thumbs }));
 	},
 
 	pushThumbnail: function (args, thumbs) {
@@ -118,18 +120,26 @@ module.exports = Field.create({
 	clearFiles: function() {
 		this.fileFieldNode().value = '';
 
-		this.setState({
+		this.setState(_.extend(this.state, {
 			thumbnails: this.state.thumbnails.filter(function (thumb) {
 				return !thumb.props.isQueued;
-			})
-		});
+			})})
+		);
+	},
+	
+	markUploaded: function(key) {
+		var thumbnails = this.state.thumbnails;
+		 thumbnails[key].props.isQueued = false;
+		this.setState(_.extend(this.state, {
+			thumbnails: thumbnails
+		}));
 	},
 
 	uploadFile: function (event) {
 		var self = this;
-
+		
 		var files = event.target.files;
-		_.each(files, function (f) {
+		_.each(files, function (f, i) {
 			if (!_.contains(SUPPORTED_TYPES, f.type)) {
 				alert('Unsupported file type. Supported formats are: GIF, PNG, JPG, BMP, ICO, PDF, TIFF, EPS, PSD, SVG');
 				return;
@@ -137,16 +147,26 @@ module.exports = Field.create({
 
 			if (window.FileReader) {
 				var fileReader = new FileReader();
-				fileReader.onload = function (e) {
-					self.pushThumbnail({ isQueued: true, url: e.target.result });
+				fileReader.onloadend = function (e) {
+					self.pushThumbnail({
+						isQueued: true,
+						file: {
+							size: f.size,
+							type: f.type,
+							name: f.name
+						},
+						url: e.target.result
+					});					
 					self.forceUpdate();
 				};
 				fileReader.readAsDataURL(f);
+				
 			} else {
 				self.pushThumbnail({ isQueued: true, url: '#' });
 				self.forceUpdate();
 			}
 		});
+		
 	},
 
 	changeImage: function() {
