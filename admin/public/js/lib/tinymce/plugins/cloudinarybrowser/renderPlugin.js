@@ -37,7 +37,8 @@ var View = React.createClass({
 			folderPath: 'Image Folder 1',//'/',
 			folders: [],
 			insertModalProps: {
-				insertCallback: this.insertThumbnail
+				insertCallback: this.insertThumbnail,
+				defaultWidth: this.props.cloudinaryBrowserImageWidth
 			},
 			props: {
 				canUpload: true,
@@ -287,4 +288,5 @@ var modelName = pluginEl.getAttribute('modelName');
 var fieldName = pluginEl.getAttribute('fieldName');
 var listPath = pluginEl.getAttribute('listPath');
 var itemName = pluginEl.getAttribute('itemName');
-React.render(<View modelName={modelName} fieldName={fieldName} listPath={listPath} itemName={itemName} />, pluginEl);
+var cloudinaryBrowserImageWidth = pluginEl.getAttribute('cloudinaryBrowserImageWidth');
+React.render(<View modelName={modelName} fieldName={fieldName} listPath={listPath} itemName={itemName} cloudinaryBrowserImageWidth={cloudinaryBrowserImageWidth} />, pluginEl);

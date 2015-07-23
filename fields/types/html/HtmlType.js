@@ -11,8 +11,9 @@ function html(list, path, options) {
 	this._nativeType = String;
 	this._defaultSize = 'full';
 	this.wysiwyg = options.wysiwyg || false;
+	this.cloudinaryBrowserImageWidth = options.cloudinaryBrowserImageWidth || undefined;
 	this.height = options.height || 180;
-	this._properties = ['wysiwyg', 'height'];
+	this._properties = ['wysiwyg', 'height', 'cloudinaryBrowserImageWidth'];
 	html.super_.call(this, list, path, options);
 }
 util.inherits(html, FieldType);

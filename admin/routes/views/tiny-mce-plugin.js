@@ -5,13 +5,16 @@ var keystone = require('../../../'),
 exports = module.exports = function(req, res) {
 	var appName = keystone.get('name') || 'Keystone';
 	
-	keystone.render(req, res, 'tiny-mce-plugin', {
+	var args = {
 		page: 'tiny-mce-plugin',
 		title: appName + ': tiny MCE plugin: ' + req.params.plugin,
-		modelName: req.query.modelName,
-		fieldName: req.query.fieldName,
-		listPath: req.query.listPath,
-		itemName: req.query.itemName,
 		plugin: req.params.plugin
-	});
+	};
+	
+	for (var key in req.query) {
+		if (req.query.hasOwnProperty(key))
+			args[key] = req.query[key];
+	}
+	
+	keystone.render(req, res, 'tiny-mce-plugin', args);
 };

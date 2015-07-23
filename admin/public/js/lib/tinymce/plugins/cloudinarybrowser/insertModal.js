@@ -68,12 +68,20 @@ module.exports = React.createClass({
 	},
 
 	show(thumbnail) {
+		var width = thumbnail.width;
+		var height = thumbnail.height;
+		var ratio = parseFloat(thumbnail.width) / parseFloat(thumbnail.height);
+		if (this.props.defaultWidth !== undefined && width > this.props.defaultWidth) {
+			width = this.props.defaultWidth;
+			height = Math.round(width / ratio); 
+		}
+		
 		this.setState({
 			thumbnail: thumbnail,
 			isOpen: true,
-			width: thumbnail.width,
-			height: thumbnail.height,
-			ratio: parseFloat(thumbnail.width) / parseFloat(thumbnail.height),
+			width: width,
+			height: height,
+			ratio: ratio,
 			description: this.descriptionFromFilename(thumbnail.filename)
 		});
 	},
