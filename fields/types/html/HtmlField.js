@@ -153,7 +153,14 @@ module.exports = Field.create({
 			
 			if (options.additionalOptions.cloudinarybrowserimages) _.extend(options.additionalOptions.cloudinarybrowserimages, cloudinaryAdditional);
 			
-			if (options.additionalOptions.cloudinarybrowserfiles) _.extend(options.additionalOptions.cloudinarybrowserfiles, cloudinaryAdditional);			
+			if (options.additionalOptions.cloudinarybrowserfiles) _.extend(options.additionalOptions.cloudinarybrowserfiles, cloudinaryAdditional);
+			
+			opts.modelName = options.cloudinaryBrowserModel;
+			opts.fieldName = options.cloudinaryBrowserField;
+			opts.listPath = this.props.list.key;
+			opts.itemName = this.props.data.name;
+			if (this.props.cloudinaryBrowserImageWidth)
+				opts.cloudinaryBrowserImageWidth = this.props.cloudinaryBrowserImageWidth;
 		}
 
 		if (this.shouldRenderField()) {
