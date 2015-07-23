@@ -186,7 +186,8 @@ var View = React.createClass({
 	},
 	
 	thumbnailClicked: function(thumb, e) {
-		this.refs.insertModal.show(thumb.props);
+		if (!thumb.props.isQueued)
+			this.refs.insertModal.show(thumb.props);
 	},
 	
 	thumbnailUpdate: function(prevProps, props, prevState, state) {
