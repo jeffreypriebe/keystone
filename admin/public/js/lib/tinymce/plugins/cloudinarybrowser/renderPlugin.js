@@ -260,7 +260,7 @@ var View = React.createClass({
 						data: d.substring(d.indexOf('base64,') + 7),
 						originalname: t.props.originalname,
 						size: t.props.size,
-						mimetype: t.props.mimetype
+						mimetype: t.props.mimetype,
 						filename: t.props.filename,
 						type: t.props.type
 					}
