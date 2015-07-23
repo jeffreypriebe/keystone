@@ -36,7 +36,9 @@ var View = React.createClass({
 		return {
 			folderPath: 'Image Folder 1',//'/',
 			folders: [],
-			insertModalProps: {},
+			insertModalProps: {
+				insertCallback: this.insertThumbnail
+			},
 			props: {
 				canUpload: true,
 				allowRemoval: false,
@@ -170,6 +172,16 @@ var View = React.createClass({
 	
 	browseUp: function() {
 		this.setState({ folderPath: '/', folderId: null }); //Single level of foldering, so "up" is always, return to root
+	},
+	
+	insertThumbnail: function(imageTag) {
+		//look for parent window and callback property to return the new thumbnail to 
+		if(window.parent && window.parent.insertThumbnail && typeof window.parent.insertThumbnail === 'function') {
+			window.parent.insertThumbnail(imageTag)
+		} else {
+			console.log('Error finding parent function, would have inserted: [next line]');
+			console.log(imageTag);
+		}	
 	},
 	
 	thumbnailClicked: function(thumb, e) {
