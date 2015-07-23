@@ -33,10 +33,11 @@ function cloudinaryimages(list, path, options) {
 	}
 
 	cloudinaryimages.super_.call(this, list, path, options);
-	
+
 	this.autoCleanup = options.autoCleanup || false;
 	this.folder = options.folder || undefined;
 	this._properties = ['autoCleanup', 'folder'];
+	this.publicID = options.publicID || false;
 
 	// validate cloudinary config
 	if (!keystone.get('cloudinary config')) {
