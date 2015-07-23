@@ -173,7 +173,7 @@ var View = React.createClass({
 	},
 	
 	thumbnailClicked: function(thumb, e) {
-		this.refs.insertModal.show();
+		this.refs.insertModal.show(thumb.props);
 	},
 	
 	thumbnailUpdate: function(prevProps, props, prevState, state) {
@@ -193,9 +193,9 @@ var View = React.createClass({
 					var d = t.props.url;
 					return {
 						data: d.substring(d.indexOf('base64,') + 7),
-						name: t.props.file.name,
-						size: t.props.file.size,
-						type: t.props.file.type
+						filename: t.props.filename,
+						size: t.props.size,
+						type: t.props.type
 					}
 				});
 		
