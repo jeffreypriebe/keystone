@@ -33,6 +33,10 @@ function cloudinaryimages(list, path, options) {
 	}
 
 	cloudinaryimages.super_.call(this, list, path, options);
+	
+	this.publicID = options.publicID || false;
+	this.autoCleanup = options.autoCleanup || false;
+	this._properties = ['publicID', 'autoCleanup'];
 
 	// validate cloudinary config
 	if (!keystone.get('cloudinary config')) {

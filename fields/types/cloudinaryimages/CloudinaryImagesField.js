@@ -28,7 +28,7 @@ var Thumbnail = React.createClass({
 
 		var actionLabel = this.props.deleted ? 'Undo' : 'Remove';
 
-		if (!this.props.isQueued && this.props.allowRemoval) {
+		if (!this.props.isQueued && (this.props.allowRemoval || this.props.allowRemoval === undefined)) {
 			imageDetails = (
 				<div className='image-details'>
 					<button onClick={this.props.toggleDelete} type='button' className='btn btn-link btn-cancel btn-undo-remove'>{actionLabel}</button>
@@ -251,7 +251,8 @@ module.exports = Field.create({
 		_.each(this.state.thumbnails, function (thumb) {
 			if (thumb && thumb.props.deleted) remove.push(thumb.props.public_id);
 		});
-		if (remove.length) value = 'remove:' + remove.join(',');
+		var action = this.props.autoCleanup ? 'delete:' : 'remove:';
+		if (remove.length) value = action + remove.join(',');
 
 		return <input ref='action' className='field-action' type='hidden' value={value} name={this.props.paths.action} />;
 	},
