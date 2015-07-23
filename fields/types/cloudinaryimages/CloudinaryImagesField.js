@@ -158,11 +158,9 @@ module.exports = Field.create({
 				fileReader.onloadend = function (e) {
 					self.pushThumbnail({
 						isQueued: true,
-						file: {
-							size: f.size,
-							type: f.type,
-							name: f.name
-						},
+						filename: f.name,
+						type: f.type,
+						size: f.size,
 						url: e.target.result
 					});					
 					self.forceUpdate();

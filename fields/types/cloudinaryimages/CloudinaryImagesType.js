@@ -82,7 +82,9 @@ cloudinaryimages.prototype.addToSchema = function() {
 		url:			String,
 		width:			Number,
 		height:			Number,
-		secure_url:		String
+		secure_url:		String,
+		filename:		String,
+		type:			String
 	});
 
 	// Generate cloudinary folder used to upload/select images
@@ -358,6 +360,10 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 					if (result.error) {
 						return next(result.error);
 					} else {
+						_.extend(result, {
+							filename: file.filename,
+							type: file.type
+						});
 						item.get(field.path).push(result);
 						return next();
 					}
