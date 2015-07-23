@@ -261,6 +261,8 @@ var View = React.createClass({
 						originalname: t.props.originalname,
 						size: t.props.size,
 						mimetype: t.props.mimetype
+						filename: t.props.filename,
+						type: t.props.type
 					}
 				});
 		

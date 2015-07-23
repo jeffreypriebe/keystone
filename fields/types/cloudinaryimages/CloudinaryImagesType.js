@@ -87,14 +87,11 @@ cloudinaryimages.prototype.addToSchema = function() {
 		width:			Number,
 		height:			Number,
 		secure_url:		String,
-<<<<<<< HEAD
 		originalname:	String,
 		mimetype:		String,
 		size:			Number
-=======
 		filename:		String,
 		type:			String
->>>>>>> Added filename and type to Model.
 	});
 
 	// Generate cloudinary folder used to upload/select images

@@ -9,6 +9,8 @@ var elemental = require('elemental'),
 	ModalBody = elemental.ModalBody,
 	ModalFooter = elemental.ModalFooter;
 
+var maxImagePixels = 40000;
+
 module.exports = React.createClass({
 	
 	displayName: 'cloudinaryInsertModal',
@@ -16,16 +18,67 @@ module.exports = React.createClass({
 	getInitialState() {
 		return {
 			formProcessing: false,
-			isOpen: true, //false,
-			email: '',
-			password: '',
-			
-			//defaultDescription: this.
+			isOpen: false,			
+			thumbnail: {}
 		};
 	},
 	
-	show() {
-		this.setState({ isOpen: true });
+	componentWillUpdate: function(nextProps, nextState) {
+	},
+	
+	recalculateWidthHeight: function(newState) {
+		var newWidth = false, newHeight = false;
+		
+		if(this.state.width !== undefined && this.state.height !== undefined) {
+			if(newState.width !== undefined && newState.width !== this.state.width) {
+				newWidth = true;
+			} else if(newState.height !== undefined && newState.height !== this.state.height) {
+				newHeight = true;
+			}
+		}
+		
+		var result = _.extend(newState);
+		if(newWidth) {
+			result.height = Math.round(newState.width / this.state.ratio);
+		} else if (newHeight) {
+			result.width = Math.round(newState.height * this.state.ratio)
+		}
+		return result;
+	},
+	
+	handleTextChange: function(max, event) {
+		var newStateData = {};
+		if (max === undefined || parseInt(event.target.value) < parseInt(max)) {
+			newStateData[event.target.name] = Math.round(event.target.value);
+			if(event.target.name === "width" || event.target.name === "height")
+				newStateData = this.recalculateWidthHeight(newStateData);
+			this.setState(newStateData);
+		}
+	},
+	
+	show(thumbnail) {
+		this.setState({
+			thumbnail: thumbnail,
+			isOpen: true,
+			width: thumbnail.width,
+			height: thumbnail.height,
+			ratio: parseFloat(thumbnail.width) / parseFloat(thumbnail.height),
+			description: this.descriptionFromFilename(thumbnail.filename)
+		});
+	},
+	
+	descriptionFromFilename: function(filename) {
+		var desc = filename.indexOf('.') !== -1 ?
+			filename.substring(0, filename.lastIndexOf('.')) :
+			filename;
+		desc = desc.replace(/[-_]/g, ' ');
+		// desc = desc.split(/(?=[A-Z])/).map(function(p) {
+        // 	return p.charAt(0).toUpperCase() + p.slice(1);
+    	// }).join(' ');
+		desc = desc.split(/(?=[A-Z])/).join(' ');
+		desc = desc.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+		
+		return desc;
 	},
 	
 	toggleModal() {
@@ -46,19 +99,19 @@ module.exports = React.createClass({
 				<form className="horizontal-form" action="#" onSubmit={this.submitForm} noValidate>
 					<ModalBody>
 						<FormField label="File">
-							<div>Filename here</div>
+							<div>{this.state.thumbnail.filename}</div>
 						</FormField>
 						<FormField label="Description">
-							<FormInput label="Description" type="text" name="description" ref="description" placeholder={this.state.defaultDescription} required size="sm" />
+							<FormInput label="Description" type="text" name="description" ref="description" value={this.state.description} onChange={this.handleTextChange} required size="sm" />
 						</FormField>
 						<FormField label="Size">
 							<FormRow>
 								<FormField label="Width">
-									<FormInput label="Width" pattern="[0-9]+" name="width" ref="width" />
+										<FormInput label="Width" pattern="[0-9]+" name="width" value={this.state.width} onChange={this.handleTextChange.bind(this, maxImagePixels)} ref="width" />
 								</FormField>
 								<div className="form-field size-x">x</div>
 								<FormField label="Height">
-									<FormInput label="Height" pattern="[0-9]+" name="height" ref="height" />
+									<FormInput label="Height" pattern="[0-9]+" name="height" value={this.state.height} onChange={this.handleTextChange.bind(this, maxImagePixels)} ref="height" />
 								</FormField>
 							</FormRow>
 						</FormField>
