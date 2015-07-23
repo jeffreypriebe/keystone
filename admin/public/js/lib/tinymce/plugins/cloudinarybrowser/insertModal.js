@@ -72,16 +72,37 @@ module.exports = React.createClass({
 			filename.substring(0, filename.lastIndexOf('.')) :
 			filename;
 		desc = desc.replace(/[-_]/g, ' ');
-		// desc = desc.split(/(?=[A-Z])/).map(function(p) {
-        // 	return p.charAt(0).toUpperCase() + p.slice(1);
-    	// }).join(' ');
 		desc = desc.split(/(?=[A-Z])/).join(' ');
 		desc = desc.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 		
 		return desc;
 	},
 	
-	toggleModal() {
+	buildImageTag: function() {
+		var id = this.state.thumbnail.public_id.replace(/["']/g, '&quot;');
+		var width = this.state.width;
+		var height = this.state.height;		
+		var cloudinaryUrl = $.cloudinary.url(id, { width: width, height: height, crop: 'fill' });
+		var url = cloudinaryUrl.replace('http:', ''); //make protocol relative
+		//this.state.thumbnail.url
+		var alt = this.state.description.replace(/["']/g, '&quot;');
+		
+		return '<img id="' + id + '" ' +
+			'src="' + url + '" ' +
+			'alt="' + alt + '" ' +
+			'width="' + width + '" ' +
+			'height="' + height + '" ' +
+			'/>';
+	},
+	
+	insertImage: function() {
+		if (this.props.insertCallback && typeof this.props.insertCallback === 'function') {
+			var imageTag = this.buildImageTag();
+			this.props.insertCallback(imageTag);
+		};
+	},
+	
+	toggleModal: function() {
 		var self = this;
 		this.setState({
 			isOpen: !this.state.isOpen
@@ -117,11 +138,11 @@ module.exports = React.createClass({
 						</FormField>
 					</ModalBody>
 					<ModalFooter>
+						<Button type="primary" onClick={this.insertImage}>Insert Image</Button>
 						<Button onClick={this.toggleModal} type="link-cancel" disabled={this.state.formProcessing}>Cancel</Button>
 					</ModalFooter>
 				</form>
 			</Modal>
 		);
-						//{submitButton}
 	}
 });
