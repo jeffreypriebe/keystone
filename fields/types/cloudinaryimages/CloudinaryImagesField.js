@@ -41,11 +41,13 @@ var Thumbnail = React.createClass({
 		var linkClick = this.props.imageClick
 			? this.props.imageClick.bind(this, self)
 			: null;
+		
+		var additionalLinkClass = this.props.isQueued ? ' img-thumbnail-uploading' : '';
 
 		return (
 			<div className='image-field image-sortable row col-sm-3 col-md-12' title={title}> 
 				<div className={previewClassName}> 
-					<a href={url} onClick={linkClick} className='img-thumbnail'> 
+					<a href={url} onClick={linkClick} className={'img-thumbnail' + additionalLinkClass}> 
 						<img style={{ height: '90' }} className='img-load' src={this.props.url} />
 						<span className={iconClassName} />
 					</a>
