@@ -12,50 +12,61 @@ var elemental = require('elemental'),
 var maxImagePixels = 40000;
 
 module.exports = React.createClass({
-	
+
 	displayName: 'cloudinaryInsertModal',
-	
+
 	getInitialState() {
 		return {
 			formProcessing: false,
-			isOpen: false,			
+			isOpen: false,
 			thumbnail: {}
 		};
 	},
-	
-	componentWillUpdate: function(nextProps, nextState) {
+
+	componentWillUpdate: function (nextProps, nextState) {
 	},
-	
-	recalculateWidthHeight: function(newState) {
+
+	componentDidUpdate: function (prevProps, prevState) {
+		if (prevState.isOpen !== this.state.isOpen && this.state.isOpen)
+			this.refs.description.getDOMNode().focus();
+	},
+
+	recalculateWidthHeight: function (newState) {
 		var newWidth = false, newHeight = false;
-		
-		if(this.state.width !== undefined && this.state.height !== undefined) {
-			if(newState.width !== undefined && newState.width !== this.state.width) {
+
+		if (this.state.width !== undefined && this.state.height !== undefined) {
+			if (newState.width !== undefined && newState.width !== this.state.width) {
 				newWidth = true;
-			} else if(newState.height !== undefined && newState.height !== this.state.height) {
+			} else if (newState.height !== undefined && newState.height !== this.state.height) {
 				newHeight = true;
 			}
 		}
-		
+
 		var result = _.extend(newState);
-		if(newWidth) {
+		if (newWidth) {
 			result.height = Math.round(newState.width / this.state.ratio);
 		} else if (newHeight) {
 			result.width = Math.round(newState.height * this.state.ratio)
 		}
 		return result;
 	},
-	
-	handleTextChange: function(max, event) {
+
+	handleTextChange: function (max, event) {
 		var newStateData = {};
-		if (max === undefined || parseInt(event.target.value) < parseInt(max)) {
-			newStateData[event.target.name] = Math.round(event.target.value);
-			if(event.target.name === "width" || event.target.name === "height")
+		var setVal = function(v) { newStateData[event.target.name] = v; }
+		var val = event.target.value;	
+		
+		if (isNaN(val)) {
+			setVal(val);
+		} else if (!isNaN(val) && (max === undefined || parseInt(val) < parseInt(max))) {
+			setVal(Math.round(val));
+			if (event.target.name === "width" || event.target.name === "height")
 				newStateData = this.recalculateWidthHeight(newStateData);
-			this.setState(newStateData);
 		}
+		
+		this.setState(newStateData);
 	},
-	
+
 	show(thumbnail) {
 		this.setState({
 			thumbnail: thumbnail,
@@ -66,27 +77,34 @@ module.exports = React.createClass({
 			description: this.descriptionFromFilename(thumbnail.filename)
 		});
 	},
-	
-	descriptionFromFilename: function(filename) {
+
+	descriptionFromFilename: function (filename) {
 		var desc = filename.indexOf('.') !== -1 ?
 			filename.substring(0, filename.lastIndexOf('.')) :
 			filename;
 		desc = desc.replace(/[-_]/g, ' ');
 		desc = desc.split(/(?=[A-Z])/).join(' ');
 		desc = desc.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-		
+
 		return desc;
 	},
-	
-	buildImageTag: function() {
+
+	keyUp: function (e) {
+		switch(e.keyCode) {
+			case 13: this.insertImage(); break; //enter
+			case 27: this.closeModal(); break; //escape
+			default: return;
+		}
+	},
+
+	buildImageTag: function () {
 		var id = this.state.thumbnail.public_id.replace(/["']/g, '&quot;');
 		var width = this.state.width;
-		var height = this.state.height;		
+		var height = this.state.height;
 		var cloudinaryUrl = $.cloudinary.url(id, { width: width, height: height, crop: 'fill' });
 		var url = cloudinaryUrl.replace('http:', ''); //make protocol relative
-		//this.state.thumbnail.url
 		var alt = this.state.description.replace(/["']/g, '&quot;');
-		
+
 		return '<img id="' + id + '" ' +
 			'src="' + url + '" ' +
 			'alt="' + alt + '" ' +
@@ -94,36 +112,33 @@ module.exports = React.createClass({
 			'height="' + height + '" ' +
 			'/>';
 	},
-	
-	insertImage: function() {
+
+	insertImage: function () {
 		if (this.props.insertCallback && typeof this.props.insertCallback === 'function') {
 			var imageTag = this.buildImageTag();
 			this.props.insertCallback(imageTag);
 		};
 	},
 	
-	toggleModal: function() {
-		var self = this;
-		this.setState({
-			isOpen: !this.state.isOpen
-		}, function () {
-			if (self.state.isOpen) {
-				self.refs.first.getDOMNode().focus();
-			}
-		});
+	closeModal: function () {
+		this.setState({ isOpen: false });
 	},
-	
-	render: function() {
+
+	toggleModal: function () {
+		this.setState({ isOpen: !this.state.isOpen });
+	},
+
+	render: function () {
 		return (
 			<Modal isOpen={this.state.isOpen} onCancel={this.toggleModal} backdropClosesModal>
 				<ModalHeader text="Insert Image" showCloseButton onClose={this.toggleModal} />
-				<form className="horizontal-form" action="#" onSubmit={this.submitForm} noValidate>
+				<form onKeyUp={this.keyUp} className="horizontal-form" action="#" onSubmit={this.submitForm} noValidate>
 					<ModalBody>
 						<FormField label="File">
 							<div>{this.state.thumbnail.filename}</div>
 						</FormField>
 						<FormField label="Description">
-							<FormInput label="Description" type="text" name="description" ref="description" value={this.state.description} onChange={this.handleTextChange} required size="sm" />
+							<FormInput label="Description" type="text" name="description" ref="description" value={this.state.description} onChange={this.handleTextChange.bind(this, undefined)} required size="sm" />
 						</FormField>
 						<FormField label="Size">
 							<FormRow>
