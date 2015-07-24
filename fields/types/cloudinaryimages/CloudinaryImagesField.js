@@ -36,6 +36,10 @@ var Thumbnail = React.createClass({
 			);
 		}
 		
+		var imageUrl = (this.props.isQueued || !this.props.public_id || !$.cloudinary) ?
+			this.props.url :
+			$.cloudinary.url(this.props.public_id, { height: 90, crop: 'fill' });
+		
 		var url = !this.props.imageClick ? this.props.url : '#'
 		
 		var linkClick = this.props.imageClick
@@ -43,12 +47,17 @@ var Thumbnail = React.createClass({
 			: null;
 		
 		var additionalLinkClass = this.props.isQueued ? ' img-thumbnail-uploading' : '';
-
+		
+		var height = 90;
+		var width = !isNaN(this.props.width) && !isNaN(this.props.height)
+			? Math.round(height * (this.props.width / this.props.height))
+			: null;	
+		
 		return (
 			<div className='image-field image-sortable row col-sm-3 col-md-12' title={title}> 
 				<div className={previewClassName}> 
 					<a href={url} onClick={linkClick} className={'img-thumbnail' + additionalLinkClass}> 
-						<img style={{ height: '90' }} className='img-load' src={this.props.url} />
+						<img height={height} width={width} className='img-load' src={imageUrl} />
 						<span className={iconClassName} />
 					</a>
 				</div>
