@@ -2,6 +2,8 @@ var React = require('react');
 var request = require('superagent');
 var _ = require('underscore');
 var InsertModal = require('./insertModal');
+var elemental = require('elemental'),
+	Spinner = elemental.Spinner;
 
 var Thumbnail = require('../../../../../../../fields/types/cloudinaryimages/CloudinaryImagesField.js');
 
@@ -40,6 +42,7 @@ var View = React.createClass({
 				insertCallback: this.insertThumbnail,
 				defaultWidth: this.props.cloudinaryBrowserImageWidth
 			},
+			isLoading: false,
 			props: {
 				canUpload: true,
 				allowRemoval: false,
@@ -89,7 +92,7 @@ var View = React.createClass({
 	
 	loadData: function() {
 		var newCanUpload = true;
-		if (!this.state.folderPath || (this.state.folderPath === '/' && !this.state.folderId)) {
+		if (!this.state.folderPath || (this.state.folderPath === '/' && !this.state.folderId)) {			
 			newCanUpload = false;
 			this.listAllFolders(); //top-level folder
 		} else if (!this.state.folderId) {
@@ -101,6 +104,7 @@ var View = React.createClass({
 	},
 	
 	listAllFolders: function() {
+		var showLoading = setTimeout(function() { this.setState(_.extend(this.state, { isLoading: true })); }, 300);
 		request.get('/keystone/api/image-folders/autocomplete')
 			.set('Accept', 'application/json')
 			.end((err, res) => {
@@ -108,18 +112,27 @@ var View = React.createClass({
 					// TODO: nicer error handling
 					console.log('Error loading item data:', res ? res.text : err);
 					alert('Error loading data (details logged to console)');
+					this.setState(_.extend(this.state, { isLoading: false }));
+					clearTimeout(showLoading);
 					return;
 				}
-				if (!res.body.items) return; //Empty, that's allowed
+				if (!res.body.items) {
+					clearTimeout(showLoading);
+					this.setState(_.extend(this.state, { isLoading: false }));
+					return; //Empty, that's allowed
+				}
 				
+				clearTimeout(showLoading);
 				this.updateValueState([]); //Empty images
 				this.setState({
-					folders: res.body.items
+					folders: res.body.items,
+					isLoading: false
 				});
 			});
 	},
 
 	loadFolderFromPath: function() {
+		var showLoading = setTimeout(function() { this.setState(_.extend(this.state, { isLoading: true })); }, 300);
 		request.get('/keystone/api/' + this.props.modelName + '/autocomplete?q=' + this.state.folderPath)
 			.set('Accept', 'application/json')
 			.end((err, res) => {
@@ -127,22 +140,27 @@ var View = React.createClass({
 					// TODO: nicer error handling
 					console.log('Error loading item data:', res ? res.text : err);
 					alert('Error loading data (details logged to console)');
+					this.setState(_.extend(this.state, { isLoading: false }));
+					clearTimeout(showLoading);
 					return;
 				}
 				
 				if(!res.body.items || res.body.total === 0) {
+					clearTimeout(showLoading);
 					this.updateValueState([]);
 					return; //Folder not found
 				}
 				
 				var Folder = res.body.items[0];			
 				
+				clearTimeout(showLoading);
 				this.setState(_.extend(this.state, { folderId: Folder.id }));
 				this.loadFolderData(Folder.id);
 			});
 	},
 	
 	loadFolderData: function(id) {
+		var showLoading = setTimeout(function() { this.setState(_.extend(this.state, { isLoading: true })); }, 300);
 		request.get('/keystone/api/' + this.props.modelName + '/' + id)
 			.set('Accept', 'application/json')
 			.end((err, res) => {
@@ -150,15 +168,21 @@ var View = React.createClass({
 					// TODO: nicer error handling
 					console.log('Error loading item data:', res ? res.text : err);
 					alert('Error loading data (details logged to console)');
+					this.setState(_.extend(this.state, { isLoading: false }));
+					clearTimeout(showLoading);
 					return;
 				}
 				
 				if(!res.body.fields[this.props.fieldName]) {
+					clearTimeout(showLoading);
 					this.updateValueState([]);
+					this.setState(_.extend(this.state, { isLoading: false }));
 					return; //Folder doesn't have any images
 				}
-						
+				
+				clearTimeout(showLoading);
 				this.updateValueState(res.body.fields[this.props.fieldName]);
+				this.setState(_.extend(this.state, { isLoading: false }));
 			});		
 	},
 	
@@ -168,6 +192,7 @@ var View = React.createClass({
 			folderId: id,
 			folders: []
 		};
+		this.refs.thumbnails.clearFiles();
 		this.setState(newPath);
 	},
 	
@@ -198,6 +223,8 @@ var View = React.createClass({
 	
 	postThumbnails: function(e) {
 		if (e) e.preventDefault();
+		
+		this.setState(_.extend(this.state, { isLoading: true }));
 		
 		var thumbnails = this.refs.thumbnails;
 		var thumbsToUpload = thumbnails.state.thumbnails.
@@ -230,12 +257,14 @@ var View = React.createClass({
 					// TODO: nicer error handling
 					console.log('Error posting item data update:', res ? res.text : err);
 					alert('Error posting data (details logged to console)');
+					this.setState(_.extend(this.state, { isLoading: false }));
 					return;
 				}
 				
 				//Upload successful, keep them around (dequeue and clear the file upload field);
 				thumbsToUpload.forEach(t => thumbnails.markUploaded(t.key));
 				thumbnails.clearFiles();
+				this.setState(_.extend(this.state, { isLoading: false }));
 			});
 	},
 	
@@ -258,6 +287,15 @@ var View = React.createClass({
 		);
 	},
 	
+	renderPostingSpinner: function() {
+		if (this.state.isLoading)
+			return (
+				<div className="postSpinnerHolder">
+					<Spinner size="lg" type="inverted" />
+				</div>
+			);
+	},
+	
 	renderThumbnails: function() {
 		return React.createElement(Thumbnail, _.extend(this.state.props, { ref: 'thumbnails', cb: this.thumbnailUpdate }));
 	},
@@ -271,6 +309,7 @@ var View = React.createClass({
 		if(!this.state.props.value) return <div><p>Loading&#8230;</p></div>;
 		return (
 			<div>
+			{this.renderPostingSpinner()}
 			{this.renderFolderPath()}
 			{this.renderFolders()}
 			{this.renderEmptySpacer()}

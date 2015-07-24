@@ -11,7 +11,7 @@
 }
 .folders { clear: both; }
 .folders-empty {
-	height: 141px;
+	height: 110px;
 	width: 100%;
 }
 .folder {
@@ -29,6 +29,23 @@
 	.field-label { display: none; }
 }
 
+.postSpinnerHolder {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 555;
+	background-color: #ccc;
+	background-color: rgba(0,0,0,0.19);
+	top: 0;
+	left: 0;
+	
+	.Spinner {
+		display: block;
+		margin: 0 auto;
+		top: 49%;
+	}
+}
+
 .img-thumbnail-uploading {
 	cursor: default;
 }
@@ -36,10 +53,17 @@
 #plugin-view {
 	.FormRow > .form-field {
 		width: auto;
-	}	
+	}
+	.full-width {
+		.field-ui, .images-toolbar {
+			width: 100%
+		}
+	}
+	.full-width;
 	.size-x { padding-top: 2.35em; }
 	@media(max-width: 767px) {
 		.size-x { display: none; }
+		.full-width;
 	}
 	.Modal-dialog {
 		margin-top: 0px;
