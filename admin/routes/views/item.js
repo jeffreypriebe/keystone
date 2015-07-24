@@ -78,6 +78,7 @@ exports = module.exports = function(req, res) {
 			if (!keystone.security.csrf.validate(req)) {
 				console.error('CSRF failure', req.method, req.body);
 				req.flash('error', 'There was a problem with your request, please try again.');
+				res.status(403);
 				return renderView();
 			}
 
