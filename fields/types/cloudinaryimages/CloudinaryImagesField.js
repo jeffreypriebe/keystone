@@ -57,7 +57,7 @@ var Thumbnail = React.createClass({
 			<div className='image-field image-sortable row col-sm-3 col-md-12' title={title}> 
 				<div className={previewClassName}> 
 					<a href={url} onClick={linkClick} className={'img-thumbnail' + additionalLinkClass}> 
-						<img height={height} width={width} className='img-load' src={imageUrl} />
+						<img height={height} width={width} style={{height: height + 'px'}} className='img-load' src={imageUrl} />
 						<span className={iconClassName} />
 					</a>
 				</div>
@@ -146,9 +146,10 @@ module.exports = Field.create({
 		);
 	},
 	
-	markUploaded: function(key) {
+	markUploaded: function(key, public_id) {
 		var thumbnails = this.state.thumbnails;
-		 thumbnails[key].props.isQueued = false;
+		thumbnails[key].props.isQueued = false;
+		thumbnails[key].props.public_id = public_id;
 		this.setState(_.extend(this.state, {
 			thumbnails: thumbnails
 		}));
@@ -167,14 +168,21 @@ module.exports = Field.create({
 			if (window.FileReader) {
 				var fileReader = new FileReader();
 				fileReader.onloadend = function (e) {
-					self.pushThumbnail({
-						isQueued: true,
-						filename: f.name,
-						type: f.type,
-						size: f.size,
-						url: e.target.result
-					});
-					self.forceUpdate();
+					//Read images width & height
+					var newImage = new Image();
+					newImage.src = e.target.result;
+					newImage.onload = function() {					
+						self.pushThumbnail({
+							isQueued: true,
+							width: newImage.width,
+							height: newImage.height,
+							originalname: f.name,
+							mimetype: f.type,
+							size: f.size,
+							url: e.target.result
+						});
+						self.forceUpdate();
+					}
 				};
 				fileReader.readAsDataURL(f);
 				

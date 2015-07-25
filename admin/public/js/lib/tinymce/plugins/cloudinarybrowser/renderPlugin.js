@@ -234,9 +234,9 @@ var View = React.createClass({
 					var d = t.props.url;
 					return {
 						data: d.substring(d.indexOf('base64,') + 7),
-						filename: t.props.filename,
+						originalname: t.props.originalname,
 						size: t.props.size,
-						type: t.props.type
+						mimetype: t.props.mimetype
 					}
 				});
 		
@@ -248,12 +248,12 @@ var View = React.createClass({
 		postObj[this.props.fieldName + '_upload'] = JSON.stringify(newThumbs);
 		
 		var postData = Keystone.csrf(postObj);
-		var req = request.post('/keystone/' + this.props.modelName + '/' + this.state.folderId)
+		request.post('/keystone/' + this.props.modelName + '/' + this.state.folderId)
 			.set('Accept', 'application/json')
 			.type('form')
 			.send(postData)
 			.end((err, res) => {
-				if(err || !res.ok) {
+				if(err || !res.ok || !res.body || !res.body[this.props.fieldName] || !Array.isArray(res.body[this.props.fieldName])) {
 					// TODO: nicer error handling
 					console.log('Error posting item data update:', res ? res.text : err);
 					alert('Error posting data (details logged to console)');
@@ -262,7 +262,18 @@ var View = React.createClass({
 				}
 				
 				//Upload successful, keep them around (dequeue and clear the file upload field);
-				thumbsToUpload.forEach(t => thumbnails.markUploaded(t.key));
+				thumbsToUpload.forEach(t => {
+					var imageFilter = res.body[this.props.fieldName]
+						.filter(i => i.originalname === t.props.originalname && i.size === t.props.size);
+					
+					if (_.isEmpty(imageFilter)) {
+						console.error('Error looking up file ' + t.originalname);
+						console.error('Probably uploaded, but not found in server response.');
+					} else {
+						var image = imageFilter[0];
+						thumbnails.markUploaded(t.key, image.public_id);
+					}
+				});
 				thumbnails.clearFiles();
 				this.setState(_.extend(this.state, { isLoading: false }));
 			});

@@ -87,8 +87,9 @@ cloudinaryimages.prototype.addToSchema = function() {
 		width:			Number,
 		height:			Number,
 		secure_url:		String,
-		filename:		String,
-		type:			String
+		originalname:	String,
+		mimetype:		String,
+		size:			Number
 	});
 
 	// Generate cloudinary folder used to upload/select images
@@ -365,10 +366,11 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 						return next(result.error);
 					} else {
 						_.extend(result, {
-							filename: file.filename,
-							type: file.type
+							originalname: file.originalname,
+							mimetype: file.mimetype,
+							size: file.size
 						});
-						item.get(field.path).push(result);
+						item.get(field.path).push(result);						
 						return next();
 					}
 				};
