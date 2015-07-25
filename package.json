@@ -33,6 +33,7 @@
     "debug": "^2.2.0",
     "embedly": "^1.0.4",
     "elemental": "git://github.com/elementalui/elemental#v0.2.0",
+    "embedly": "~1.0.4",
     "errorhandler": "^1.4.2",
     "express": "^4.13.3",
     "express-minify": "^0.1.6",
