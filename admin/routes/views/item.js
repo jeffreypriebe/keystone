@@ -86,8 +86,12 @@ exports = module.exports = function(req, res) {
 				if (err) {
 					return renderView();
 				}
-				req.flash('success', 'Your changes have been saved.');
-				return res.redirect('/keystone/' + req.list.path + '/' + item.id);
+				req.flash('success', 'Your changes have been saved.');				
+				
+				if(req.accepts('html'))
+					return res.redirect('/keystone/' + req.list.path + '/' + item.id);
+				else
+					return res.json(item);
 			});
 
 
