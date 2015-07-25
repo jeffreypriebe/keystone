@@ -82,7 +82,7 @@ module.exports = React.createClass({
 			width: width,
 			height: height,
 			ratio: ratio,
-			description: this.descriptionFromFilename(thumbnail.filename)
+			description: this.descriptionFromFilename(thumbnail.originalname)
 		});
 	},
 
@@ -143,7 +143,7 @@ module.exports = React.createClass({
 				<form onKeyUp={this.keyUp} className="horizontal-form" action="#" onSubmit={this.submitForm} noValidate>
 					<ModalBody>
 						<FormField label="File">
-							<div>{this.state.thumbnail.filename}</div>
+							<div>{this.state.thumbnail.originalname}</div>
 						</FormField>
 						<FormField label="Description">
 							<FormInput label="Description" type="text" name="description" ref="description" value={this.state.description} onChange={this.handleTextChange.bind(this, undefined)} required size="sm" />

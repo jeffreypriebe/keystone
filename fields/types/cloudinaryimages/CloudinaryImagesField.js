@@ -56,7 +56,7 @@ var Thumbnail = React.createClass({
 		/*eslint-disable */
 		return (
 			<div className='image-field image-sortable row col-sm-3 col-md-12' title={title}> 
-				<div className={previewClassName}> 
+				<div className={previewClassName}>
 					<a href={url} onClick={linkClick} className={'img-thumbnail' + additionalLinkClass}>
 						<img height={height} width={width} style={{height: height + 'px'}} className='img-load' src={imageUrl} />
 						<span className={iconClassName} />

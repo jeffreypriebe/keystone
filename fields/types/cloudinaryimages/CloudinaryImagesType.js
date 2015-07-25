@@ -89,7 +89,7 @@ cloudinaryimages.prototype.addToSchema = function() {
 		secure_url:		String,
 		originalname:	String,
 		mimetype:		String,
-		size:			Number
+		size:			Number,
 		filename:		String,
 		type:			String
 	});
@@ -373,7 +373,7 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 							mimetype: file.mimetype,
 							size: file.size
 						});
-						item.get(field.path).push(result);
+						item.get(field.path).push(result);						
 						return next();
 					}
 				};
