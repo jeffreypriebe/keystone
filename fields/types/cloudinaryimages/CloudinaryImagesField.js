@@ -173,7 +173,7 @@ module.exports = Field.create({
 						type: f.type,
 						size: f.size,
 						url: e.target.result
-					});					
+					});
 					self.forceUpdate();
 				};
 				fileReader.readAsDataURL(f);

@@ -35,6 +35,7 @@
     "elemental": "git://github.com/elementalui/elemental#v0.2.0",
     "errorhandler": "^1.4.2",
     "express": "^4.13.3",
+    "express-minify": "^0.1.6",
     "express-session": "^1.11.3",
     "fs-extra": "^0.24.0",
     "glob": "^5.0.14",

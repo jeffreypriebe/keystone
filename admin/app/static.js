@@ -11,22 +11,37 @@ var express = require('express');
 var glob = require('glob');
 var less = require('less-middleware');
 var path = require('path');
+var minify = require('express-minify');
 var router = express.Router();
 
 /* Browersify all Tiny-MCE React-based plugins */
 
-var pluckPluginName = /(.*tinymce\/plugins\/([^\/]+)\/)renderPlugin.js$/i;
+var mapPlugin = function(file, pluckNameReg) {
+	var nameMatch = pluckNameReg.exec(file);
+	if (!nameMatch) throw new Error('Unexpected name format for TinyMCE plugin ' + file); 
+	return {
+		file: path.relative(__dirname, file).replace(/\\/g, '/'),
+		fileRoot: '/' + path.relative(__dirname + '/../', file).replace(/\\/g, '/'),
+		path: nameMatch[1],
+		pathRoot: '/' + path.relative(__dirname + '/../', nameMatch[1]).replace(/\\/g, '/') + '/',
+		pathRootNoPublic: path.normalize('/' + path.relative(__dirname + '/../', nameMatch[1]).replace('public' + path.sep, '')).replace(/\\/g, '/') + '/',
+		name: nameMatch[2],
+		filename: nameMatch[3]
+	};
+};
+
 var basePluginFolder = '/../public/js/lib/tinymce/plugins/';
-var tinyPlugins = glob.sync(__dirname + basePluginFolder + '**/renderPlugin.js')
-	.map(function(file) {
-		var nameMatch = pluckPluginName.exec(file);
-		if (!nameMatch) throw new Error('Unexpected name format for TinyMCE plugin ' + file); 
-		return {
-			file: path.relative(__dirname, file).replace(/\\/g, '/'),
-			path: nameMatch[1],
-			name: nameMatch[2]
-		};
-	});
+var pluckReactPluginName = /(.*tinymce\/plugins\/([^\/]+)\/)(renderPlugin)\.js$/i;
+var tinyReactPlugins = glob.sync(__dirname + basePluginFolder + '**/renderPlugin.js')
+	.map(function(file) { return mapPlugin(file, pluckReactPluginName); });
+
+/* Browserify all Tiny-MCE plugins - plugin js vs. any React-based renderPlugin js */
+var pluckPluginName = /(.*tinymce\/plugins\/([^\/]+)\/)([^\.]+)\.js$/i;
+var tinyPlugins = glob.sync(__dirname + basePluginFolder + '**/plugin.js')
+	.map(function(file) { return mapPlugin(file, pluckPluginName); });
+
+// var allTinyPlugins = tinyPlugins.slice();
+// Array.prototype.push.apply(allTinyPlugins, tinyReactPlugins);
 
 /* Prepare browserify bundles */
 
@@ -36,7 +51,7 @@ var bundles = {
 	item: browserify('views/item.js'),
 	list: browserify('views/list.js')	
 };
-tinyPlugins.forEach(function(p) { bundles[p.name] = browserify(p.file); });
+tinyReactPlugins.forEach(function(p) { bundles[p.name] = browserify(p.file); });
 
 router.prebuild = function() {
 	bundles.fields.build();
@@ -44,7 +59,7 @@ router.prebuild = function() {
 	bundles.item.build();
 	bundles.list.build();
 };
-tinyPlugins.forEach(function(p) { router.prebuild[p.name] = bundles[p.name].build(); });
+tinyReactPlugins.forEach(function(p) { router.prebuild[p.name] = bundles[p.name].build(); });
 
 
 /* Prepare LESS options */
@@ -60,7 +75,6 @@ var lessOptions = {
 };
 
 /* Configure router */
-
 router.use('/styles', less(__dirname + '../../public/styles', lessOptions));
 router.use(express.static(__dirname + '../../public'));
 router.use('/styles/elemental', less(__dirname + '/../../node_modules/elemental/less', lessOptions));
@@ -70,6 +84,10 @@ router.get('/js/home.js', bundles.home.serve);
 router.get('/js/item.js', bundles.item.serve);
 router.get('/js/list.js', bundles.list.serve);
 tinyPlugins.forEach(function(p) {
+	router.get(p.pathRootNoPublic, minify());
+	router.use(p.pathRootNoPublic + p.filename + '.min.js', express.static(path.resolve(__dirname + '/' + p.file)));
+});
+tinyReactPlugins.forEach(function(p) {
 	router.get('/js/tiny-mce-plugins/' + p.name + '.js', bundles[p.name].serve);
 	router.use('/styles/tiny-mce-plugins/' + p.name, less(p.path, lessOptions));
 });
