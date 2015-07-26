@@ -9,14 +9,14 @@ html
 		title= title
 
 		//- Component Stylesheets
-		//link(rel="stylesheet", href="/keystone/js/lib/select2/select2-3.3.2.css")
-		//link(rel="stylesheet", href="/keystone/js/lib/pikaday/pikaday-1.1.0.css")
+		link(rel="stylesheet", href="/keystone/js/lib/select2/select2-3.3.2.css")
+		link(rel="stylesheet", href="/keystone/js/lib/pikaday/pikaday-1.1.0.css")
 
 		//- Keystone Stylesheet
 		link(rel="stylesheet", href="/keystone/styles/keystone.min.css")
 		block css
 
-		//link(rel="shortcut icon", href="/favicon.ico", type="image/x-icon")
+		link(rel="shortcut icon", href="/favicon.ico", type="image/x-icon")
 		block head
 
 	body(id='page-' + page)
@@ -56,7 +56,6 @@ html
 			Keystone.csrf.key = "#{csrf_token_key}";
 			Keystone.csrf.value = "#{csrf_token_value}";
 			Keystone.csrf.query = "!{csrf_query}";
-		// Keystone.pluginId = "#{plugin}";
 		if cloudinary
 			script(src='/keystone/js/lib/cloudinary/jquery.cloudinary.js')
 			| !{cloudinary_js_config}
@@ -67,23 +66,9 @@ html
 					timestamp: "#{cloudinary.timestamp}",
 					signature: "#{cloudinary.signature}"
 				}
-		// 	script(src='/keystone/js/lib/jqueryfileupload/vendor/jquery.ui.widget.js')
-		// 	script(src='/keystone/js/lib/jqueryfileupload/jquery.iframe-transport.js')
-		// 	script(src='/keystone/js/lib/jqueryfileupload/jquery.fileupload.js')
-
-		//- Keystone UI
-		// script(src="/keystone/js/common/plugins.js")
-		// script(src="/keystone/js/common/ui.js")
-		// script(src="/keystone/js/common/ui-alt-text.js")
-		// script(src="/keystone/js/common/ui-sortable.js")
 		
-		// script.
-		// 	Keystone.list = !{JSON.stringify(list.getOptions())};
-		// 	Keystone.wysiwyg = { options: !{JSON.stringify(wysiwygOptions)} };
-		// 	Keystone.itemId = '!{item.id}';
 		script(src='/keystone/js/packages.js')
 		script(src='/keystone/js/fields.js')
-		//script(src='/keystone/js/tiny-mce-plugin.js')
 		
 		//- Page Scripts
 		block js
