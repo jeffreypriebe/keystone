@@ -16,19 +16,22 @@ tinymce.PluginManager.add("cloudinarybrowser", function (editor, url) {
 	//On image resize, update cloudinary url
 	editor.on('ObjectResized', function(e) {
 		var el = $(e.target);
-		
+				
 		if(el.attr('src').indexOf('cloudinary.com') === -1) return; //Not a cloudinary image
-		
+				
 		var id = el.attr('id');
 		if(!id) {
 			console.log('Found a cloudinary image to resize but it has no id. Can\'t resize.');
 			return;
 		}
-		
+				
 		var cloudinaryUrl = $.cloudinary.url(id, { width: e.width, height: e.height, crop: 'fill' });
 		var url = cloudinaryUrl.replace('http:', ''); //protocol relative 
 		
-		el.attr('src', url);
+		
+		var content = editor.getContent();
+		content = content.replace(new RegExp("(.*?<img.+?id=[\"']" + id + "[\"'].*?src=[\"'])[^\"']+(\".*)", "gi"), "$1" + url +"$2");
+		editor.setContent(content, { format: "raw" });
 	});
 	
 	//Open plugin window
