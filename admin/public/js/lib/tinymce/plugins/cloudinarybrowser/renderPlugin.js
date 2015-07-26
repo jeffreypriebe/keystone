@@ -227,8 +227,15 @@ var View = React.createClass({
 		this.setState(_.extend(this.state, { isLoading: true }));
 		
 		var thumbnails = this.refs.thumbnails;
-		var thumbsToUpload = thumbnails.state.thumbnails.
-				filter(t => t.props.isQueued);	//Only new, queued files
+		var thumbsToUpload = [], existingThumbs = [];
+		thumbnails.state.thumbnails.forEach(t => {
+			if(t.props.isQueued)
+				thumbsToUpload.push(t);
+			else
+				existingThumbs.push(t);
+		});
+		// var thumbsToUpload = thumbnails.state.thumbnails.
+		// 		filter(t => t.props.isQueued);	//Only new, queued files
 		var newThumbs = thumbsToUpload.
 				map(t => {
 					var d = t.props.url;
@@ -261,9 +268,12 @@ var View = React.createClass({
 					return;
 				}
 				
+				var newImages = res.body[this.props.fieldName]
+					.filter(i => _.isEmpty(existingThumbs.filter(t => t.props.public_id === i.public_id)));
+				
 				//Upload successful, keep them around (dequeue and clear the file upload field);
 				thumbsToUpload.forEach(t => {
-					var imageFilter = res.body[this.props.fieldName]
+					var imageFilter = newImages
 						.filter(i => i.originalname === t.props.originalname && i.size === t.props.size);
 					
 					if (_.isEmpty(imageFilter)) {
