@@ -315,8 +315,8 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 
 		// Upload Data (form submissions)
 		var filesAt = req.files[paths.upload];
-		if(!filesAt && req.body[paths.upload])
-			filesAt = JSON.parse(req.body[paths.upload]);
+		if (!filesAt && req.body[paths.upload]) filesAt = JSON.parse(req.body[paths.upload]);
+		
 		if (req.files && filesAt) {
 			var files = [].concat(filesAt);
 
@@ -330,17 +330,18 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 				tags: [tp + field.list.path + '_' + field.path, tp + field.list.path + '_' + field.path + '_' + item.id]
 			};
 
-			var uploadFolder = []
+			var uploadFolder = [];
 			if (keystone.get('cloudinary folders')) {
 				uploadFolder.push(item.get(paths.folder));
 			}
 			
 			if (keystone.get('cloudinary folders use item name')) {
-				uploadFolder.push(item.get("name"));
+				uploadFolder.push(item.get('name'));
 			}
 			
-			if (!_.isEmpty(uploadFolder))
+			if (!_.isEmpty(uploadFolder)) {
 				uploadOptions.folder = uploadFolder.join('/');
+			}
 
 			if (keystone.get('cloudinary prefix')) {
 				uploadOptions.tags.push(keystone.get('cloudinary prefix'));
@@ -375,9 +376,9 @@ cloudinaryimages.prototype.getRequestHandler = function(item, req, paths, callba
 					}
 				};
 				
-				if(file.path)
+				if(file.path) {
 					cloudinary.uploader.upload(file.path, cloudinaryResultHandler, uploadOptions);
-				else if(file.data) {
+				} else if(file.data) {
 					var dataStream = new Stream.Readable();
 					dataStream._read = function() {};
 					dataStream.push(file.data);

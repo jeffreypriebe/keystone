@@ -37,8 +37,9 @@ module.exports = function(file, name, addOpts) {
 		if (building) return;
 		building = true;
 		var opts = { basedir: basedir };
-		if (addOpts)
+		if (addOpts) {
 			_.extend(opts, addOpts);
+		}
 		if (devMode) {
 			logInit(file);
 			opts.cache = {};

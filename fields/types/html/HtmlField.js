@@ -148,8 +148,9 @@ module.exports = Field.create({
 			opts.fieldName = options.cloudinaryBrowserField;
 			opts.listPath = this.props.list.key;
 			opts.itemName = this.props.data.name;
-			if (this.props.cloudinaryBrowserImageWidth)
+			if (this.props.cloudinaryBrowserImageWidth) {
 				opts.cloudinaryBrowserImageWidth = this.props.cloudinaryBrowserImageWidth;
+			}
 		}
 
 		if (this.shouldRenderField()) {

@@ -36,7 +36,7 @@ var View = React.createClass({
 	
 	getInitialState: function() {
 		return {
-			folderPath: 'Image Folder 1',//'/',
+			folderPath: '/',
 			folders: [],
 			insertModalProps: {
 				insertCallback: this.insertThumbnail,

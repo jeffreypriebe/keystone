@@ -1,6 +1,4 @@
-var keystone = require('../../../'),
-	_ = require('underscore'),
-	async = require('async');
+var keystone = require('../../../');
 
 exports = module.exports = function(req, res) {
 	var appName = keystone.get('name') || 'Keystone';
@@ -12,8 +10,9 @@ exports = module.exports = function(req, res) {
 	};
 	
 	for (var key in req.query) {
-		if (req.query.hasOwnProperty(key))
+		if (req.query.hasOwnProperty(key)) {
 			args[key] = req.query[key];
+		}
 	}
 	
 	keystone.render(req, res, 'tiny-mce-plugin', args);

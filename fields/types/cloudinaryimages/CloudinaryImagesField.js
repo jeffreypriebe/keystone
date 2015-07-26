@@ -22,9 +22,9 @@ var Thumbnail = React.createClass({
 		if (this.props.deleted || this.props.isQueued) previewClassName += ' action';
 
 		var title = '';
-		var width = this.props.width;
-		var height = this.props.height;
-		if (width && height) title = width + ' x ' + height;
+		var fullWidth = this.props.width;
+		var fullHeight = this.props.height;
+		if (width && height) title = fullWidth + ' x ' + fullHeight;
 
 		var actionLabel = this.props.deleted ? 'Undo' : 'Remove';
 
@@ -40,7 +40,7 @@ var Thumbnail = React.createClass({
 			this.props.url :
 			$.cloudinary.url(this.props.public_id, { height: 90, crop: 'fill' });
 		
-		var url = !this.props.imageClick ? this.props.url : '#'
+		var url = !this.props.imageClick ? this.props.url : '#';
 		
 		var linkClick = this.props.imageClick
 			? this.props.imageClick.bind(this, self)
@@ -52,7 +52,8 @@ var Thumbnail = React.createClass({
 		var width = !isNaN(this.props.width) && !isNaN(this.props.height)
 			? Math.round(height * (this.props.width / this.props.height))
 			: null;	
-		
+			
+		/*eslint-disable */
 		return (
 			<div className='image-field image-sortable row col-sm-3 col-md-12' title={title}> 
 				<div className={previewClassName}> 
@@ -65,6 +66,7 @@ var Thumbnail = React.createClass({
 				{imageDetails}
 			</div>
 		);
+		/*eslint-enable */
 	}
 	
 });
@@ -77,20 +79,24 @@ module.exports = Field.create({
 		return { files: [], thumbnails: thumbnails };
 	},
 	
-	componentDidUpdate: function(prevProps, prevState) {
-		if(prevProps.value !== this.props.value) {
-			var thumbnails = this.processThumbnails(this.props.value);
+	componentWillUpdate: function(nextProps, nextState) {
+		if(nextProps.value !== this.props.value) {
+			var thumbnails = this.processThumbnails(nextProps.value);
 			this.setState(_.extend(this.state, { thumbnails: thumbnails }));
-		}
-		if (this.props.cb && typeof this.props.cb === 'function')
-			this.props.cb(prevProps, this.props, prevState, this.state);
+		}		
 	},
 	
-	processThumbnails(thumbs) {
+	componentDidUpdate: function(prevProps, prevState) {
+		if (this.props.cb && typeof this.props.cb === 'function') {
+			this.props.cb(prevProps, this.props, prevState, this.state);
+		}
+	},
+	
+	processThumbnails (thumbs) {
 		var self = this;
 		var thumbnails = [];
 
-		_.each(this.props.value, function (item) {
+		_.each(thumbs, function (item) {
 			self.pushThumbnail(item, thumbnails);
 		});
 		
@@ -142,7 +148,7 @@ module.exports = Field.create({
 		this.setState(_.extend(this.state, {
 			thumbnails: this.state.thumbnails.filter(function (thumb) {
 				return !thumb.props.isQueued;
-			})})
+			}) })
 		);
 	},
 	
@@ -159,7 +165,7 @@ module.exports = Field.create({
 		var self = this;
 		
 		var files = event.target.files;
-		_.each(files, function (f, i) {
+		_.each(files, function (f) {
 			if (!_.contains(SUPPORTED_TYPES, f.type)) {
 				alert('Unsupported file type. Supported formats are: GIF, PNG, JPG, BMP, ICO, PDF, TIFF, EPS, PSD, SVG');
 				return;
@@ -182,7 +188,7 @@ module.exports = Field.create({
 							url: e.target.result
 						});
 						self.forceUpdate();
-					}
+					};
 				};
 				fileReader.readAsDataURL(f);
 				
@@ -203,8 +209,7 @@ module.exports = Field.create({
 	},
 
 	renderToolbar: function() {
-		if(this.props.canUpload === false)
-			return;
+		if(this.props.canUpload === false) return;
 		
 		var body = [];
 
