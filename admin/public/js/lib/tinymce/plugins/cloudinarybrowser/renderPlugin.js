@@ -105,7 +105,7 @@ var View = React.createClass({
 	
 	listAllFolders: function() {
 		var showLoading = setTimeout(function() { this.setState(_.extend(this.state, { isLoading: true })); }, 300);
-		request.get('/keystone/api/image-folders/autocomplete')
+		request.get('/keystone/api/' + this.props.modelName + '/autocomplete')
 			.set('Accept', 'application/json')
 			.end((err, res) => {
 				if(err || !res.ok || !res.body) {
@@ -234,8 +234,7 @@ var View = React.createClass({
 			else
 				existingThumbs.push(t);
 		});
-		// var thumbsToUpload = thumbnails.state.thumbnails.
-		// 		filter(t => t.props.isQueued);	//Only new, queued files
+		
 		var newThumbs = thumbsToUpload.
 				map(t => {
 					var d = t.props.url;

@@ -23,8 +23,8 @@ var mapPlugin = function(file, pluckNameReg) {
 		file: path.relative(__dirname, file).replace(/\\/g, '/'),
 		fileRoot: '/' + path.relative(__dirname + '/../', file).replace(/\\/g, '/'),
 		path: nameMatch[1],
-		pathRoot: '/' + path.relative(__dirname + '/../', nameMatch[1]).replace(/\\/g, '/') + '/',
-		pathRootNoPublic: path.normalize('/' + path.relative(__dirname + '/../', nameMatch[1]).replace('public' + path.sep, '')).replace(/\\/g, '/') + '/',
+		pathRoot: '/' + path.relative(__dirname + '/../', nameMatch[1]).replace(/\\/g, '/'),
+		pathRootNoPublic: path.normalize('/' + path.relative(__dirname + '/../', nameMatch[1]).replace('public' + path.sep, '')).replace(/\\/g, '/'),
 		name: nameMatch[2],
 		filename: nameMatch[3]
 	};
@@ -84,8 +84,16 @@ router.get('/js/home.js', bundles.home.serve);
 router.get('/js/item.js', bundles.item.serve);
 router.get('/js/list.js', bundles.list.serve);
 tinyPlugins.forEach(function(p) {
-	router.get(p.pathRootNoPublic, minify());
-	router.use(p.pathRootNoPublic + p.filename + '.min.js', express.static(path.resolve(__dirname + '/' + p.file)));
+	if (p.name !== 'cloudinarybrowser') {
+		router.get(p.pathRootNoPublic + '/', minify());
+		router.use(p.pathRootNoPublic + '/' + p.filename + '.min.js', express.static(path.resolve(__dirname + '/' + p.file)));
+	} else {
+		//cloudinarybrowser functions as two plugins
+		router.get(p.pathRootNoPublic + 'images/', minify());
+		router.use(p.pathRootNoPublic + 'images/' + p.filename + '.min.js', express.static(path.resolve(__dirname + '/' + p.file)));
+		router.get(p.pathRootNoPublic + 'files/', minify());
+		router.use(p.pathRootNoPublic + 'files/' + p.filename + '.min.js', express.static(path.resolve(__dirname + '/' + p.file)));		
+	}
 });
 tinyReactPlugins.forEach(function(p) {
 	router.get('/js/tiny-mce-plugins/' + p.name + '.js', bundles[p.name].serve);
