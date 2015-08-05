@@ -11,6 +11,8 @@ var _ = require('underscore'),
 	utils = require('keystone-utils'),
 	grappling = require('grappling-hook'),
 	async = require('async'),
+	Stream = require('stream'),
+	base64Stream = require('base64-stream'),
 	super_ = require('../Type');
 
 /**
@@ -425,9 +427,12 @@ s3files.prototype.uploadFile = function(item, file, update, callback) {
 		filename = field.options.filename(item, filename, originalname);
 	}
 
+	if (!file.path && file.data) //add a Content-Length header
+		field.options.headers = _.extend(field.options.headers || {}, { 'Content-Length': file.size.toString() });
+	
 	headers = field.generateHeaders(item, file, callback);
-
-	knox.createClient(field.s3config).putFile(file.path, path + filename, headers, function(err, res) {
+	
+	var s3ResultHandler = function(err, res) {
 
 		if (err) return callback(err);
 		if (res) {
@@ -455,8 +460,22 @@ s3files.prototype.uploadFile = function(item, file, update, callback) {
 		}
 
 		callback(null, fileData);
-
-	});
+	};
+	
+	var s3Client = knox.createClient(field.s3config);
+	
+	if(file.path) {
+		s3Client.putFile(file.path, path + filename, headers, s3ResultHandler);
+	} else if(file.data) {
+		var dataStream = new Stream.Readable();
+		dataStream._read = function() {};
+		dataStream.push(file.data);
+		dataStream.push(null);
+		
+		s3Client.putStream(dataStream, path + filename, headers, s3ResultHandler);
+	} else {
+		return callback();
+	}
 };
 
 
@@ -530,16 +549,22 @@ s3files.prototype.getRequestHandler = function(item, req, paths, callback) {
 			});
 		}
 		
-		if (!req.files || !req.files[paths.upload]) return callback();
-		
+		// Upload Data (form submissions)
 		var upFiles = req.files[paths.upload];
+		if (!upFiles && req.body[paths.upload]) upFiles = JSON.parse(req.body[paths.upload]);
+		
+		if (!upFiles) return callback();
+				
 		if (!Array.isArray(upFiles)) {
 			upFiles = [upFiles];
 		}
 		
-		if (_.isEmpty(upFiles)) return callback();
+		if (_.isEmpty(upFiles)) return callback();			
 		
-		upFiles = _.filter(upFiles, function(f) { return typeof f.name !== 'undefined' && f.name.length > 0 && f.size > 0;});
+		upFiles = _.filter(upFiles, function(f) {
+			var filename = f.name || f.originalname;
+			return typeof filename !== 'undefined' && filename.length > 0 && f.size > 0
+		});
 
 		if (upFiles.length > 0) {
 			console.log('uploading files:');

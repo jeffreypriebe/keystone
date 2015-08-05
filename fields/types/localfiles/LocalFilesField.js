@@ -50,14 +50,33 @@ var Item = React.createClass({
 module.exports = Field.create({
 
 	getInitialState: function () {
-		var items = [];
-		var self = this;
-
-		_.each(this.props.value, function (item) {
-			self.pushItem(item, items);
-		});
+		var items = this.processItems(this.props.value);
 
 		return { items: items };
+	},
+	
+	componentWillUpdate: function(nextProps, nextState) {
+		if(nextProps.value !== this.props.value) {
+			var items = this.processItems(nextProps.value);
+			this.setState(_.extend(this.state, { items: items }));
+		}
+	},
+	
+	componentDidUpdate: function(prevProps, prevState) {
+		if (this.props.cb && typeof this.props.cb === 'function') {
+			this.props.cb(prevProps, this.props, prevState, this.state);
+		}
+	},
+	
+	processItems: function(items) {
+		var self = this;
+		var newItems = []
+		
+		_.each(items, function (item) {
+			self.pushItem(item, newItems);
+		});
+
+		return newItems;		
 	},
 
 	removeItem: function (i) {
@@ -97,14 +116,40 @@ module.exports = Field.create({
 			})
 		});
 	},
+	
+	markUploaded: function(key, item_id) {
+		var thumbnails = this.state.items;
+		thumbnails[key].props.isQueued = false;
+		thumbnails[key].props._id = item_id;
+		this.setState(_.extend(this.state, {
+			items: thumbnails
+		}));
+	},
 
 	uploadFile: function (event) {
 		var self = this;
 
 		var files = event.target.files;
+		
 		_.each(files, function (f) {
-			self.pushItem({ isQueued: true, filename: f.name });
-			self.forceUpdate();
+			if (!self.props.gatherFileData || !window.FileReader) {			
+				self.pushItem({ isQueued: true, filename: f.name });
+				self.forceUpdate();
+			} else {
+				var fileReader = new FileReader();
+				fileReader.onloadend = function(e) {
+					self.pushItem({
+						isQueued: true,
+						filename: f.name,
+						originalname: f.name,
+						mimetype: f.type,
+						size: f.size,
+						url: e.target.result						
+					});
+					self.forceUpdate();
+				};
+				fileReader.readAsDataURL(f);
+			}
 		});
 	},
 

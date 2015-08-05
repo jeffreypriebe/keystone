@@ -8,7 +8,7 @@ var pluginFunction = function (pluginType) {
 		var pluginOpts = {
 			name: "cloudinarybrowser" + pluginType,
 			icon: pluginType === pluginTypes.IMAGES ? 'image' : 'files',
-			tooltip: pluginType === pluginTypes.IMAGES ? 'Insert an image' : 'Insert a file',
+			tooltip: pluginType === pluginTypes.IMAGES ? 'Insert an image' : 'Insert a link to a file',
 			title: pluginType === pluginTypes.IMAGES ? 'Browse Images' : 'Browse Files'
 		};
 	
@@ -18,6 +18,7 @@ var pluginFunction = function (pluginType) {
 		var params = optsToPass.map(function (o) {
 			return o + '=' + sourceParam[o];
 		}).join('&');
+		params += '&mode=' + pluginType;
 		var browseUrl = '/keystone/tiny-mce-plugin/cloudinarybrowser?' + params;
 	
 		//Add close function for our plugin window to callback to.

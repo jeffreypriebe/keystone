@@ -5,7 +5,8 @@ var InsertModal = require('./insertModal');
 var elemental = require('elemental'),
 	Spinner = elemental.Spinner;
 
-var Thumbnail = require('../../../../../../../fields/types/cloudinaryimages/CloudinaryImagesField.js');
+var ThumbnailImage = require('../../../../../../../fields/types/cloudinaryimages/CloudinaryImagesField.js');
+var ThumbnailFile = require('../../../../../../../fields/types/s3files/S3FilesField.js');
 
 var Folder = React.createClass({
 	
@@ -35,7 +36,7 @@ var View = React.createClass({
 	displayName: 'PluginView',
 	
 	getInitialState: function() {
-		return {
+		var initialState = {
 			folderPath: '/',
 			folders: [],
 			insertModalProps: {
@@ -53,8 +54,24 @@ var View = React.createClass({
 					uploads: this.props.fieldName + '_uploads'
 				}
 			},
+			childItemsFieldName: '',
+			itemIdProp: '', 
 			itemData: null
 		};
+		
+		if(this.props.mode === 'images') {
+			_.extend(initialState, {
+				childItemsFieldName: 'thumbnails',
+				itemIdProp: 'public_id'
+			});
+		} else if (this.props.mode === 'files') {
+			_.extend(initialState, {
+				childItemsFieldName: 'items',
+				itemIdProp: '_id'
+			});
+		}
+		
+		return initialState;
 	},
 
 	componentDidMount: function() {
@@ -217,8 +234,8 @@ var View = React.createClass({
 	
 	thumbnailUpdate: function(prevProps, props, prevState, state) {
 		//thumbnail manages itself on the state.thumbnails - but we have only the props.value that we passed in, that's why we are comparing to see if these changes
-		if(state.thumbnails.length !== this.state.childFileCount)
-			this.setState(_.extend(this.state, { childFileCount: state.thumbnails.length }))
+		if(state[this.state.childItemsFieldName] && state[this.state.childItemsFieldName].length !== this.state.childFileCount)
+			this.setState(_.extend(this.state, { childFileCount: state[this.state.childItemsFieldName].length }))
 	},
 	
 	postThumbnails: function(e) {
@@ -228,7 +245,7 @@ var View = React.createClass({
 		
 		var thumbnails = this.refs.thumbnails;
 		var thumbsToUpload = [], existingThumbs = [];
-		thumbnails.state.thumbnails.forEach(t => {
+		thumbnails.state[this.state.childItemsFieldName].forEach(t => {
 			if(t.props.isQueued)
 				thumbsToUpload.push(t);
 			else
@@ -268,7 +285,7 @@ var View = React.createClass({
 				}
 				
 				var newImages = res.body[this.props.fieldName]
-					.filter(i => _.isEmpty(existingThumbs.filter(t => t.props.public_id === i.public_id)));
+					.filter(i => _.isEmpty(existingThumbs.filter(t => t.props[this.state.itemIdProp] === i[this.state.itemIdProp])));
 				
 				//Upload successful, keep them around (dequeue and clear the file upload field);
 				thumbsToUpload.forEach(t => {
@@ -280,7 +297,7 @@ var View = React.createClass({
 						console.error('Probably uploaded, but not found in server response.');
 					} else {
 						var image = imageFilter[0];
-						thumbnails.markUploaded(t.key, image.public_id);
+						thumbnails.markUploaded(t.key, image[this.state.itemIdProp]);
 					}
 				});
 				thumbnails.clearFiles();
@@ -317,7 +334,11 @@ var View = React.createClass({
 	},
 	
 	renderThumbnails: function() {
-		return React.createElement(Thumbnail, _.extend(this.state.props, { ref: 'thumbnails', cb: this.thumbnailUpdate }));
+		if(this.props.mode === 'images') {
+			return React.createElement(ThumbnailImage, _.extend(this.state.props, { ref: 'thumbnails', cb: this.thumbnailUpdate, gatherFileData: true }));
+		} else if (this.props.mode === 'files') {
+			return React.createElement(ThumbnailFile, _.extend(this.state.props, { ref: 'thumbnails', cb: this.thumbnailUpdate, gatherFileData: true }));
+		}
 	},
 	
 	renderEmptySpacer: function() {
@@ -348,5 +369,6 @@ var modelName = pluginEl.getAttribute('modelName');
 var fieldName = pluginEl.getAttribute('fieldName');
 var listPath = pluginEl.getAttribute('listPath');
 var itemName = pluginEl.getAttribute('itemName');
+var mode = pluginEl.getAttribute('mode');
 var cloudinaryBrowserImageWidth = pluginEl.getAttribute('cloudinaryBrowserImageWidth');
-React.render(<View modelName={modelName} fieldName={fieldName} listPath={listPath} itemName={itemName} cloudinaryBrowserImageWidth={cloudinaryBrowserImageWidth} />, pluginEl);
+React.render(<View modelName={modelName} fieldName={fieldName} listPath={listPath} itemName={itemName} mode={mode} cloudinaryBrowserImageWidth={cloudinaryBrowserImageWidth} />, pluginEl);
