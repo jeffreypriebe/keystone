@@ -7,7 +7,7 @@ var pluginFunction = function (pluginType) {
 		
 		var pluginOpts = {
 			name: "cloudinarybrowser" + pluginType,
-			icon: pluginType === pluginTypes.IMAGES ? 'image' : 'files',
+			icon: pluginType === pluginTypes.IMAGES ? 'image' : 'browse',
 			tooltip: pluginType === pluginTypes.IMAGES ? 'Insert an image' : 'Insert a link to a file',
 			title: pluginType === pluginTypes.IMAGES ? 'Browse Images' : 'Browse Files'
 		};
