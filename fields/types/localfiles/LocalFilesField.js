@@ -1,7 +1,8 @@
 var _ = require('underscore'),
 	bytes = require('bytes'),
 	React = require('react'),
-	Field = require('../Field');
+	Field = require('../Field'),
+	moment = require('moment');
 
 var ICON_EXTS = [
 	'aac', 'ai', 'aiff', 'avi', 'bmp', 'c', 'cpp', 'css', 'dat', 'dmg', 'doc', 'dotx', 'dwg', 'dxf', 'eps', 'exe', 'flv', 'gif', 'h',
@@ -22,10 +23,15 @@ var Item = React.createClass({
 		var body = [];
 
 		body.push(<img className='file-icon' src={'/keystone/images/icons/32/' + iconName + '.png'} />);
-		body.push(<span className='file-filename'>{filename}</span>);
+		body.push(<span className='file-filename'>{filename}</span>);			
 
 		if (this.props.size) {
 			body.push(<span className='file-size'>{bytes(this.props.size)}</span>);
+		}
+		
+		if (this.props.modified) {
+			var dt = moment(this.props.modified);
+			body.push(<span className='file-modified-date' title={dt.format()}>{dt.from(Date.now())}</span>);
 		}
 
 		if (this.props.deleted) {
@@ -34,7 +40,7 @@ var Item = React.createClass({
 			body.push(<span className='file-note-upload'>save to upload</span>);
 		}
 
-		if (!this.props.isQueued) {
+		if (!this.props.isQueued && (this.props.allowRemoval || this.props.allowRemoval === undefined)) {
 			var actionLabel = this.props.deleted ? 'undo' : 'remove';
 			body.push(<span className='file-action' onClick={this.props.toggleDelete}>{actionLabel}</span>);
 		}
@@ -96,7 +102,8 @@ module.exports = Field.create({
 		thumbs = thumbs || this.state.items;
 		var i = thumbs.length;
 		args.toggleDelete = this.removeItem.bind(this, i);
-		thumbs.push(<Item key={i} {...args} />);
+		var allowRemoval = this.props.allowRemoval === null ? true : this.props.allowRemoval;
+		thumbs.push(<Item key={i} allowRemoval={allowRemoval} {...args} />);
 	},
 
 	fileFieldNode: function () {
@@ -161,7 +168,9 @@ module.exports = Field.create({
 		return this.refs.fileField && this.fileFieldNode().value;
 	},
 
-	renderToolbar: function () {
+	renderToolbar: function () {		
+		if(this.props.canUpload === false) return;
+		
 		var clearFilesButton;
 		if (this.hasFiles()) {
 			clearFilesButton = <button type='button' className='btn btn-default btn-upload' onClick={this.clearFiles}>Clear uploads</button>;
@@ -213,7 +222,7 @@ module.exports = Field.create({
 		return <input ref="action" className="field-action" type="hidden" value={value} name={this.props.paths.action} />;
 	},
 
-	renderUploadsField: function () {
+	renderUploadsField: function () {		
 		return <input ref="uploads" className="field-uploads" type="hidden" name={this.props.paths.uploads} />;
 	},
 
