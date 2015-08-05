@@ -1,7 +1,8 @@
 var React = require('react');
 var request = require('superagent');
 var _ = require('underscore');
-var InsertModal = require('./insertModal');
+var InsertModalImage = require('./insertModalImage');
+var InsertModalLink = require('./insertModalLink');
 var elemental = require('elemental'),
 	Spinner = elemental.Spinner;
 
@@ -346,8 +347,16 @@ var View = React.createClass({
 			return <div className="folders folders-empty" />	
 	},
 	
+	renderModal: function() {
+		if (this.props.mode === 'images') {
+			return (<InsertModalImage ref='insertModal' {...this.state.insertModalProps} />)
+		} else if (this.props.mode === 'files') {
+			return (<InsertModalLink ref='insertModal' {...this.state.insertModalProps} />)
+		}
+	},
+	
 	render: function() {
-		if(!this.state.props.value) return <div><p>Loading&#8230;</p></div>;
+		if(!this.state.props.value) return <div><p>Loading&#8230;</p></div>;		
 		return (
 			<div>
 			{this.renderPostingSpinner()}
@@ -357,7 +366,7 @@ var View = React.createClass({
 			<form onSubmit={this.postThumbnails} encType="multipart/form-data">
 				{this.renderThumbnails()}
 			</form>
-			<InsertModal ref='insertModal' {...this.state.insertModalProps} />
+			{this.renderModal()}
 			</div>
 		);
 	}

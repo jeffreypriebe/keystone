@@ -47,8 +47,17 @@ var Item = React.createClass({
 
 		var itemClassName = 'file-item';
 		if (this.props.deleted) itemClassName += ' file-item-deleted';
-
-		return <div className={itemClassName} key={this.props.key}>{body}</div>;
+		
+		if (!this.props.imageClick || this.props.isQueued) {
+			return <div className={itemClassName} key={this.props.key}>{body}</div>;
+		} else {
+			var self = this;
+			return (
+				<a href='#' onClick={this.props.imageClick.bind(this, self)} className='file-item-click' title={'Insert ' + filename.replace('\'', '')}>
+					<div className={itemClassName} key={this.props.key}>{body}</div>
+				</a>
+			);
+		}
 	}
 	
 });
@@ -61,7 +70,9 @@ module.exports = Field.create({
 		return { items: items };
 	},
 	
+	/*eslint-disable */
 	componentWillUpdate: function(nextProps, nextState) {
+	/*eslint-enable */
 		if(nextProps.value !== this.props.value) {
 			var items = this.processItems(nextProps.value);
 			this.setState(_.extend(this.state, { items: items }));
@@ -76,7 +87,7 @@ module.exports = Field.create({
 	
 	processItems: function(items) {
 		var self = this;
-		var newItems = []
+		var newItems = [];
 		
 		_.each(items, function (item) {
 			self.pushItem(item, newItems);
@@ -103,7 +114,7 @@ module.exports = Field.create({
 		var i = thumbs.length;
 		args.toggleDelete = this.removeItem.bind(this, i);
 		var allowRemoval = this.props.allowRemoval === null ? true : this.props.allowRemoval;
-		thumbs.push(<Item key={i} allowRemoval={allowRemoval} {...args} />);
+		thumbs.push(<Item key={i} allowRemoval={allowRemoval} imageClick={this.props.imageClick} {...args} />);
 	},
 
 	fileFieldNode: function () {

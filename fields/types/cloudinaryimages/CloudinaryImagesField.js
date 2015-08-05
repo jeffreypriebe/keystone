@@ -79,7 +79,9 @@ module.exports = Field.create({
 		return { files: [], thumbnails: thumbnails };
 	},
 	
+	/*eslint-disable */
 	componentWillUpdate: function(nextProps, nextState) {
+	/*eslint-enable */
 		if(nextProps.value !== this.props.value) {
 			var thumbnails = this.processThumbnails(nextProps.value);
 			this.setState(_.extend(this.state, { thumbnails: thumbnails }));

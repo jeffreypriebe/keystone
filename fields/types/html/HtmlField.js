@@ -148,14 +148,12 @@ module.exports = Field.create({
 				listPath: this.props.list.key,
 				itemName: this.props.data.name	
 			};
-			if (this.props.cloudinaryBrowserImageWidth)
-				cloudinaryAdditional.cloudinaryBrowserImageWidth = this.props.cloudinaryBrowserImageWidth;
 			
-			if (options.additionalOptions.cloudinarybrowserimages)
-				_.extend(options.additionalOptions.cloudinarybrowserimages, cloudinaryAdditional);
+			if (this.props.cloudinaryBrowserImageWidth) cloudinaryAdditional.cloudinaryBrowserImageWidth = this.props.cloudinaryBrowserImageWidth;
 			
-			if (options.additionalOptions.cloudinarybrowserfiles)
-				_.extend(options.additionalOptions.cloudinarybrowserfiles, cloudinaryAdditional);			
+			if (options.additionalOptions.cloudinarybrowserimages) _.extend(options.additionalOptions.cloudinarybrowserimages, cloudinaryAdditional);
+			
+			if (options.additionalOptions.cloudinarybrowserfiles) _.extend(options.additionalOptions.cloudinarybrowserfiles, cloudinaryAdditional);			
 		}
 
 		if (this.shouldRenderField()) {

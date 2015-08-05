@@ -13,7 +13,6 @@ var less = require('less-middleware');
 var path = require('path');
 var minify = require('express-minify');
 var router = express.Router();
-var _ = require('underscore');
 
 /* Browersify all Tiny-MCE React-based plugins */
 
@@ -83,6 +82,7 @@ router.use('/js/lib/tinymce/skins', less(__dirname + '/../public/js/lib/tinymce/
 router.use('/js/lib/tinymce/skins/', express.static(__dirname + '/../public/js/lib/tinymce/skins'));
 router.use('/styles/elemental', less(__dirname + '/../../node_modules/elemental/less', lessOptions));
 router.use('/styles/elemental/', express.static(__dirname + '/../../node_modules/elemental/less'));
+router.use('/public/images/', express.static(__dirname + '/../../node_modules/elemental/public/images'));
 router.get('/js/fields.js', bundles.fields.serve);
 router.get('/js/home.js', bundles.home.serve);
 router.get('/js/item.js', bundles.item.serve);

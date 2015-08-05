@@ -13,7 +13,7 @@ var maxImagePixels = 40000;
 
 module.exports = React.createClass({
 
-	displayName: 'cloudinaryInsertModal',
+	displayName: 'cloudinaryInsertModalImage',
 
 	getInitialState() {
 		return {

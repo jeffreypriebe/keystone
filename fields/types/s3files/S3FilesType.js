@@ -12,7 +12,6 @@ var _ = require('underscore'),
 	grappling = require('grappling-hook'),
 	async = require('async'),
 	Stream = require('stream'),
-	base64Stream = require('base64-stream'),
 	super_ = require('../Type');
 
 /**
@@ -429,8 +428,8 @@ s3files.prototype.uploadFile = function(item, file, update, callback) {
 		filename = field.options.filename(item, filename, originalname);
 	}
 
-	if (!file.path && file.data) //add a Content-Length header
-		field.options.headers = _.extend(field.options.headers || {}, { 'Content-Length': file.size.toString() });
+	//add a Content-Length header
+	if (!file.path && file.data) field.options.headers = _.extend(field.options.headers || {}, { 'Content-Length': file.size.toString() });
 	
 	headers = field.generateHeaders(item, file, callback);
 	
@@ -566,7 +565,7 @@ s3files.prototype.getRequestHandler = function(item, req, paths, callback) {
 		
 		upFiles = _.filter(upFiles, function(f) {
 			var filename = f.name || f.originalname;
-			return typeof filename !== 'undefined' && filename.length > 0 && f.size > 0
+			return typeof filename !== 'undefined' && filename.length > 0 && f.size > 0;
 		});
 
 		if (upFiles.length > 0) {
