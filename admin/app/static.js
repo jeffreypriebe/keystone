@@ -13,6 +13,7 @@ var less = require('less-middleware');
 var path = require('path');
 var minify = require('express-minify');
 var router = express.Router();
+var _ = require('underscore');
 
 /* Browersify all Tiny-MCE React-based plugins */
 
