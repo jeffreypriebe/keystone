@@ -22,11 +22,14 @@ module.exports = Field.create({
 		
 		if (this.shouldRenderField()) {
 			input = (
+				<div>
+				<label className="field-label"></label>
 				<div className={fieldClassName}>
 					<label htmlFor={this.props.path} className="checkbox">
 						<input type='checkbox' name={this.props.path} id={this.props.path} value='true' checked={this.props.value} onChange={this.valueChanged} />
 						{this.props.label}
 					</label>
+				</div>
 				</div>
 			);
 		} else {
