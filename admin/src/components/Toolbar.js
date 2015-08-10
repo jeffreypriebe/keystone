@@ -85,7 +85,7 @@ var Toolbar = React.createClass({
 	
 	render: function() {
 		var wrapperStyle = {
-			position: 'relative',
+			//position: 'relative',
 			height: this.state.height
 		};
 		var toolbarProps = blacklist(this.props, 'children', 'style');
@@ -96,7 +96,7 @@ var Toolbar = React.createClass({
 			height: this.state.height
 		});
 		return (
-			<div ref="wrapper" style={wrapperStyle}>
+			<div ref="wrapper" className="toolbar-container" style={wrapperStyle}>
 				<div ref="toolbar" style={toolbarStyle} {...toolbarProps}>{this.props.children}</div>
 			</div>
 		);
