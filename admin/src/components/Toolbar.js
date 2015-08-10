@@ -47,8 +47,9 @@ var Toolbar = React.createClass({
 	
 	recalcPosition: function() {
 		var wrapper = this.refs.wrapper.getDOMNode();
+		var pageContainer = $("#body > .container");
 		
-		this.toolbarSize.x = wrapper.offsetWidth;
+		this.toolbarSize.x = pageContainer.width();//wrapper.offsetWidth;
 		
 		var offsetTop = 0;
 		var offsetEl = wrapper;
