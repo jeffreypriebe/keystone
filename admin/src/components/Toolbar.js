@@ -91,7 +91,7 @@ var Toolbar = React.createClass({
 		};
 		var toolbarProps = blacklist(this.props, 'children', 'style');
 		var toolbarStyle = _.extend(this.props.style || {}, {
-			position: this.state.position,
+			//position: this.state.position,
 			top: this.state.top,
 			width: this.state.width,
 			height: this.state.height
