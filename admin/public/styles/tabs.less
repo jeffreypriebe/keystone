@@ -1,17 +1,24 @@
+@import "theme/variables.less";
+
 //Tabs, and our theme-ish...
 .tabs {
 	h3.form-heading {
 		float: left;
 		cursor: pointer;
 		border: 0px; //remove default hashed line
-		border-bottom: 1px solid #aaa;
+		border-bottom: 1px solid @gray;
 		border-radius: 4px 4px 0px 0px;
 		padding: 20px 20px 10px;
 		
 		&.active {
-			border: 1px solid #aaa;
+			border: 1px solid @gray;
 			border-bottom: 0px;
-			color: #666;
+			color: @gray;
+			&:hover { color: @gray; cursor: default; background-color: transparent; }
+		}
+		&:hover {
+			//color: @brand-info;
+			background-color: @gray-lighter;
 		}
 	}
 	
