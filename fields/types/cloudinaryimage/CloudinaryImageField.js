@@ -154,7 +154,7 @@ module.exports = Field.create({
 		var url = this.getImageURL();
 
 		if (url) {
-			body = <a className='img-thumbnail' href={this.getImageURL()}>{body}</a>;
+			body = <a className='img-thumbnail' href={this.getImageURL()} target='_blank'>{body}</a>;
 		} else {
 			body = <div className='img-thumbnail'>{body}</div>;
 		}
@@ -176,7 +176,6 @@ module.exports = Field.create({
 		if (!this.hasLocal() && !this.state.removeExisting) {
 			values = (
 				<div className='image-values'>
-					<div className='field-value'>{this.props.value.url}</div>
 					{this.renderImageDimensions()}
 				</div>
 			);
