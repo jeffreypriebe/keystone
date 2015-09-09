@@ -5,7 +5,7 @@ var View = React.createClass({
 	displayName: 'HomeView',
 	
 	renderFlatNav: function() {
-		return Keystone.lists.map((list) => {
+		return Keystone.lists.map((list) => {			
 			var href = list.external ? list.path : '/keystone/' + list.path;
 			return (
 				<h3 key={list.path}>
@@ -19,6 +19,9 @@ var View = React.createClass({
 		return (
 			<div>
 				{Keystone.nav.sections.map((navSection) => {
+					if (navSection.key === 'admin') {
+						return;
+					}
 					return (
 						<div className="nav-section" key={navSection.key}>
 							<h4>{navSection.label}</h4>

@@ -37,13 +37,14 @@ html
 							li.divider
 							li: a(href=signout).signout Sign Out
 					ul.nav.navbar-nav
-						each navSection in nav.sections
+						each navSection in nav.sections 
 							if navSection.lists[0].external
 								- path = navSection.lists[0].path
 							else
 								- path = '/keystone/' + navSection.lists[0].path
-
-							li(class=section.key == navSection.key ? 'active' : null): a(href=path)= navSection.label
+							
+							if navSection.key !== 'admin' || user.isUserAdmin
+								li(class=section.key == navSection.key ? 'active' : null): a(href=path)= navSection.label
 			if section.lists && section.lists.length > 1
 				nav(role='navigation')#section-nav.navbar.navbar-default.navbar-static-top: .container
 					.navbar-header
@@ -63,7 +64,7 @@ html
 									- path = navList.path
 								else
 									- path = '/keystone/' + navList.path
-									
+								
 								li(class=navList.key == list.key ? 'active' : null): a(href=path)= navList.label
 			#body: .container
 				block intro
