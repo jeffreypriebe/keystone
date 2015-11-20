@@ -36,14 +36,14 @@ html
 						ul.nav.navbar-nav.navbar-right
 							li.divider
 							li: a(href=signout).signout Sign Out
-					ul.nav.navbar-nav
+					ul.nav.navbar-nav(foo=section.key, barbaz=user.isUserAdmin, baz=user)
 						each navSection in nav.sections 
 							if navSection.lists[0].external
 								- path = navSection.lists[0].path
 							else
 								- path = '/keystone/' + navSection.lists[0].path
 							
-							if navSection.key !== 'admin' || user.isUserAdmin
+							if navSection.key !== 'users' || user.isUserAdmin
 								li(class=section.key == navSection.key ? 'active' : null): a(href=path)= navSection.label
 			if section.lists && section.lists.length > 1
 				nav(role='navigation')#section-nav.navbar.navbar-default.navbar-static-top: .container
