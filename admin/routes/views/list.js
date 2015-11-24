@@ -14,9 +14,12 @@ exports = module.exports = function(req, res) {
 	var cleanFilters = {};
 	var queryFilters = req.list.getSearchFilters(req.query.search, filters);
 	var columns = (req.query.cols) ? req.list.expandColumns(req.query.cols) : req.list.defaultColumns;
-	var queryColumns = req.list.defaultListColumns
-		? req.list.defaultListColumns
-		: req.list.defaultColumns;
+	var queryColumns = columns;
+	try {
+		queryColumns = req.list.defaultListColumns
+			? req.list.defaultListColumns
+			: req.list.defaultColumns;
+	} catch (e) {}
 
 	_.each(filters, function(filter, path) {
 		cleanFilters[path] = _.omit(filter, 'field');
