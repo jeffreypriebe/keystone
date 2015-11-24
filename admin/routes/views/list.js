@@ -14,6 +14,9 @@ exports = module.exports = function(req, res) {
 	var cleanFilters = {};
 	var queryFilters = req.list.getSearchFilters(req.query.search, filters);
 	var columns = (req.query.cols) ? req.list.expandColumns(req.query.cols) : req.list.defaultColumns;
+	var queryColumns = req.list.defaultListColumns
+		? req.list.defaultListColumns
+		: req.list.defaultColumns;
 
 	_.each(filters, function(filter, path) {
 		cleanFilters[path] = _.omit(filter, 'field');
@@ -59,7 +62,7 @@ exports = module.exports = function(req, res) {
 			req.list.groupParent(viewFilters) :
 			req.list.paginate(viewFilters).sort(sort.by);
 
-		req.list.selectColumns(query, columns);
+		req.list.selectColumns(query, queryColumns);
 
 		var link_to = function(params) {
 			var p = params.page || '';
