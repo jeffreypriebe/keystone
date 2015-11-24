@@ -8,6 +8,7 @@ block css
 
 block js
 	script.
+		Keystone.userRoles = !{JSON.stringify(user.clientOutput)};
 		Keystone.list = !{JSON.stringify(list.getOptions())};
 		Keystone.wysiwyg = { options: !{JSON.stringify(wysiwygOptions)} };
 		Keystone.itemId = '!{item.id}';

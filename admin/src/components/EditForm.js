@@ -140,12 +140,16 @@ var EditForm = React.createClass({
 				
 				headings++;
 				el.options.values = this.state.values;
+				if(this.props.userRoles) el.options.userRoles = this.props.userRoles;
+				
 				elements['h-' + headings] = React.createElement(FormHeading, el);
 				
 			} else if (el.type === 'field') {
 				
 				var field = this.props.list.fields[el.field],
 					props = this.getFieldProps(field);
+				
+				if(this.props.userRoles) props.userRoles = this.props.userRoles;
 
 
 				if ('function' !== typeof Fields[field.type]) {

@@ -6,7 +6,7 @@ module.exports = React.createClass({
 	displayName: 'FormHeading',
 	
 	render: function() {
-		if (!evalDependsOn(this.props.options.dependsOn, this.props.options.values)) {
+		if (!evalDependsOn(this.props.options.dependsOn, this.props.options.values, this.props.options.userRoles)) {
 			return null;
 		}
 		return <h3 className="form-heading">{this.props.content}</h3>;

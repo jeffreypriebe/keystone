@@ -133,7 +133,7 @@ module.exports.create = function(spec) {
 		mixins: [Mixins.Collapse],
 		
 		render: function() {
-			if (!evalDependsOn(this.props.dependsOn, this.props.values)) {
+			if (!evalDependsOn(this.props.dependsOn, this.props.values, this.props.userRoles)) {
 				return null;
 			}
 			if (this.state.isCollapsed) {
