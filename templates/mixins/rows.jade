@@ -1,7 +1,7 @@
 include columns
 
 mixin row(list, colums, item)
-  if(user.roleValue>=item.roleValue && (!item.isPWD || user.isPWD))
+  if(user.roleValue>item.roleValue || (user.roleValue===item.roleValue && (user.id === item.id || user.isPWD)))
     tr(id=item.id, roleValue=item.roleValue, userRoleValue=user.roleValue)
       if !list.get('nodelete') && (user && (user.roleValue >= item.roleValue)) && ( !user || (user && item.id !== user.id ) )
         td.control: a(href='/keystone/' + list.path + '?delete=' + item.id + csrf_query).control-delete
