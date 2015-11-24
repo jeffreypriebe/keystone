@@ -13,6 +13,7 @@ var View = React.createClass({
 		return {
 			createIsVisible: false,
 			list: Keystone.list,
+			userRoles: Keystone.userRoles,
 			itemData: null
 		};
 	},
@@ -54,7 +55,7 @@ var View = React.createClass({
 			<div>
 				{this.renderCreateForm()}
 				<Header list={this.state.list} data={this.state.itemData} toggleCreate={this.toggleCreate} />
-				<EditForm list={this.state.list} data={this.state.itemData} />
+				<EditForm list={this.state.list} userRoles={this.state.userRoles} data={this.state.itemData} />
 			</div>
 		);
 	}
