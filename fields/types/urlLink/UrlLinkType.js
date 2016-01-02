@@ -11,6 +11,7 @@ function urlLink(list, path, options) {
 	this._nativeType = String;
 	this._underscoreMethods = ['format'];
 	this._formatUrl = options.format || removeProtocolPrefix;
+	this._properties = ['linkText'];
 	urlLink.super_.call(this, list, path, options);
 }
 util.inherits(urlLink, FieldType);
