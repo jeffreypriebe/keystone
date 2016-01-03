@@ -219,12 +219,20 @@ var View = React.createClass({
 	},
 	
 	insertThumbnail: function(imageTag) {
-		//look for parent window and callback property to return the new thumbnail to 
-		if(window.parent && window.parent.insertThumbnail && typeof window.parent.insertThumbnail === 'function') {
-			window.parent.insertThumbnail(imageTag)
-		} else {
+		//look for parent window and callback property to return the new thumbnail to
+		var logError = function() {
 			console.log('Error finding parent function, would have inserted: [next line]');
 			console.log(imageTag);
+		};
+		
+		var parent = window.parent;
+				
+		if (!parent || !parent.insertThumbnails || typeof parent.insertThumbnails !== 'object') {
+			logError();
+		} else if (!parent.insertThumbnails[this.props.editorId] || typeof parent.insertThumbnails[this.props.editorId] !== 'function') {
+			logError();
+		} else {
+			parent.insertThumbnails[this.props.editorId](imageTag)
 		}	
 	},
 	
@@ -382,4 +390,5 @@ var listPath = pluginEl.getAttribute('listPath');
 var itemName = pluginEl.getAttribute('itemName');
 var mode = pluginEl.getAttribute('mode');
 var cloudinaryBrowserImageWidth = pluginEl.getAttribute('cloudinaryBrowserImageWidth');
-React.render(<View modelName={modelName} fieldName={fieldName} listPath={listPath} itemName={itemName} mode={mode} cloudinaryBrowserImageWidth={cloudinaryBrowserImageWidth} />, pluginEl);
+var editorId = pluginEl.getAttribute('editorId');
+React.render(<View modelName={modelName} fieldName={fieldName} listPath={listPath} itemName={itemName} mode={mode} cloudinaryBrowserImageWidth={cloudinaryBrowserImageWidth} editorId={editorId} />, pluginEl);

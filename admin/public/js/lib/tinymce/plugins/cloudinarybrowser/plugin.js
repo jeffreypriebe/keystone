@@ -3,7 +3,7 @@ var pluginTypes = {
 	FILES: "files"
 };
 var pluginFunction = function (pluginType) {
-	return function (editor, url) {
+	return function (editor, url) {		
 		
 		var pluginOpts = {
 			name: "cloudinarybrowser" + pluginType,
@@ -18,11 +18,12 @@ var pluginFunction = function (pluginType) {
 		var params = optsToPass.map(function (o) {
 			return o + '=' + sourceParam[o];
 		}).join('&');
-		params += '&mode=' + pluginType;
+		params += '&mode=' + pluginType + "&editorId=" + editor.id;
 		var browseUrl = '/keystone/tiny-mce-plugin/cloudinarybrowser?' + params;
 	
 		//Add close function for our plugin window to callback to.
-		window.insertThumbnail = function (imageTag) {
+		if (!window.insertThumbnails) window.insertThumbnails = {};
+		window.insertThumbnails[editor.id] = function (imageTag) {
 			editor.insertContent(imageTag);
 			editor.windowManager.close();
 		};
