@@ -38,6 +38,10 @@ mixin column(list, col, item)
 			+column_color(value)
 		else if col.type == 'localfile'
 			+column_html(value)
+		else if col.type == 'datetime'
+			+column_datetime(value, item, col)
+		else if col.type == 'date'
+			+column_datetime(value, item, col)
 		else
 			+column_basic(value)
 
@@ -53,6 +57,12 @@ mixin column_boolean(value)
 		img(src='/keystone/images/icons/16/checkbox-checked.png', width=16, height=16)
 	else
 		img(src='/keystone/images/icons/16/checkbox-unchecked.png', width=16, height=16)
+
+mixin column_datetime(value, item, col)
+	if (col.field.isUTC)
+		div.col-value= col.field.tz(item).format(col.field.formatString)
+	else
+		div.col-value= value
 
 mixin column_html(value)
 	div.col-value!= value

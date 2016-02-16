@@ -1,5 +1,6 @@
 var FieldType = require('../Type');
 var moment = require('moment');
+var momentTimezone = require('moment-timezone');
 var util = require('util');
 
 /**
@@ -10,13 +11,13 @@ var util = require('util');
 
 function date(list, path, options) {
 	this._nativeType = Date;
-	this._underscoreMethods = ['format', 'moment', 'parse'];
+	this._underscoreMethods = ['format', 'moment', 'parse', 'tz'];
 	this._fixedSize = 'large';
 	this._properties = ['formatString', 'yearRange', 'isUTC'];
 	this.parseFormatString = options.parseFormat || 'YYYY-MM-DD';
 	this.formatString = (options.format === false) ? false : (options.format || 'Do MMM YYYY');
 	this.yearRange = options.yearRange;
-	this.isUTC = options.utc || false;
+	this.isUTC = options.utc || options.isUTC || false;
 	if (this.formatString && 'string' !== typeof this.formatString) {
 		throw new Error('FieldType.Date: options.format must be a string.');
 	}
@@ -78,6 +79,19 @@ date.prototype.moment = function(item) {
 };
 
 /**
+ * Returns a new `moment` object with with server timezone (for utc values) the field value
+ */
+date.prototype.tz = function(item, timezone) {
+	var m = moment(item.get(this.path));
+	if (this.isUTC) {
+        m.utc();
+        if (!timezone) m.tz(moment.tz.guess());
+        else m.tz(timezone);
+    }
+	return m;
+};
+
+/**
  * Parses input using moment, sets the value, and returns the moment object.
  */
 date.prototype.parse = function(item) {
@@ -111,7 +125,7 @@ date.prototype.updateItem = function(item, data) {
 		return;
 	}
 	var m = this.isUTC ? moment.utc : moment;
-	var newValue = m(data[this.path], this.parseFormatString);
+	var newValue = m(data[this.path]);
 	if (newValue.isValid()) {
 		if (!item.get(this.path) || !newValue.isSame(item.get(this.path))) {
 			item.set(this.path, newValue.toDate());

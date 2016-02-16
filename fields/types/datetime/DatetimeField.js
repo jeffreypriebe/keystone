@@ -3,6 +3,7 @@ var Field = require('../Field');
 var Note = require('../../components/Note');
 var DateInput = require('../../components/DateInput');
 var moment = require('moment');
+var momentTimezone = require('moment-timezone');
 
 module.exports = Field.create({
 	
@@ -15,7 +16,7 @@ module.exports = Field.create({
 	timeInputFormat: 'h:mm:ss a',
 
 	// parse formats (duplicated from lib/fieldTypes/datetime.js)
-	parseFormats: ['YYYY-MM-DD', 'YYYY-MM-DD h:m:s a', 'YYYY-MM-DD h:m a', 'YYYY-MM-DD H:m:s', 'YYYY-MM-DD H:m'],
+	parseFormats: ['YYYY-MM-DD', 'YYYY-MM-DD h:mm:ss a', 'YYYY-MM-DD h:mm a', 'YYYY-MM-DD H:mm:ss', 'YYYY-MM-DD H:mm'],
 
 	getInitialState: function() {
 		return {
@@ -30,15 +31,18 @@ module.exports = Field.create({
 		};
 	},
 
-	moment: function(value) {
-		var m = moment(value);
-		if (this.props.isUTC) m.utc();
+	moment: function(value, valueFormat) {
+		var m = moment(value, valueFormat);
+		if (this.props.isUTC) {
+            m.utc();
+            m.tz(moment.tz.guess()); //Set timezone per best guess of moment timezone
+        }
 		return m;
 	},
 
 	// TODO: Move isValid() so we can share with server-side code
 	isValid: function(value) {
-		return moment(value, this.parseFormats).isValid();
+        return this.moment(value, this.parseFormats).isValid();
 	},
 
 	// TODO: Move format() so we can share with server-side code
@@ -52,7 +56,7 @@ module.exports = Field.create({
 		var datetimeFormat = this.dateInputFormat + ' ' + this.timeInputFormat;
 		this.props.onChange({
 			path: this.props.path,
-			value: this.isValid(value) ? moment(value, datetimeFormat).toISOString() : null
+            value: this.isValid(value) ? this.moment(value, datetimeFormat).toISOString() : null
 		});
 	},
 
@@ -67,8 +71,8 @@ module.exports = Field.create({
 	},
 
 	setNow: function() {
-		var dateValue = moment().format(this.dateInputFormat);
-		var timeValue = moment().format(this.timeInputFormat);
+		var dateValue = this.moment().format(this.dateInputFormat);
+		var timeValue = this.moment().format(this.timeInputFormat);
 		this.setState({
 			dateValue: dateValue,
 			timeValue: timeValue
@@ -84,6 +88,7 @@ module.exports = Field.create({
 				<div className={fieldClassName}>
 					<DateInput ref="dateInput" name={this.props.paths.date} value={this.state.dateValue} format={this.dateInputFormat} onChange={this.dateChanged} />
 					<input type="text" name={this.props.paths.time} value={this.state.timeValue} placeholder="HH:MM:SS am/pm" onChange={this.timeChanged} autoComplete="off" className="form-control time" />
+                    <input type="hidden" name={this.props.path + '_timezone'} value={moment.tz.guess()} />
 					<button type="button" className="btn btn-default btn-set-now" onClick={this.setNow}>Now</button>
 				</div>
 			);

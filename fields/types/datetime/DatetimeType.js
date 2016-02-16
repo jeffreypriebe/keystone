@@ -1,9 +1,10 @@
 var moment = require('moment');
+var momentTimezone = require('moment-timezone');
 var DateType = require('../date/DateType');
 var FieldType = require('../Type');
 var util = require('util');
 
-var parseFormats = ['YYYY-MM-DD', 'YYYY-MM-DD h:m:s a', 'YYYY-MM-DD h:m a', 'YYYY-MM-DD H:m:s', 'YYYY-MM-DD H:m'];
+var parseFormats = [moment.ISO_8601, 'YYYY-MM-DD', 'YYYY-MM-DD h:m:s a', 'YYYY-MM-DD h:m a', 'YYYY-MM-DD H:m:s', 'YYYY-MM-DD H:m'];
 
 /**
  * DateTime FieldType Constructor
@@ -12,13 +13,13 @@ var parseFormats = ['YYYY-MM-DD', 'YYYY-MM-DD h:m:s a', 'YYYY-MM-DD h:m a', 'YYY
  */
 function datetime(list, path, options) {
 	this._nativeType = Date;
-	this._underscoreMethods = ['format', 'moment', 'parse'];
+	this._underscoreMethods = ['format', 'moment', 'parse', 'tz'];
 	this._fixedSize = 'large';
 	this._properties = ['formatString', 'isUTC'];
 	this.typeDescription = 'date and time';
 	this.parseFormatString = options.parseFormat || parseFormats;
-	this.formatString = (options.format === false) ? false : (options.format || 'YYYY-MM-DD h:m:s a');
-	this.isUTC = options.utc || false;
+	this.formatString = (options.format === false) ? false : (options.format || 'YYYY-MM-DD h:mm:ss a');
+	this.isUTC = options.utc || options.isUTC || false;
 	if (this.formatString && 'string' !== typeof this.formatString) {
 		throw new Error('FieldType.DateTime: options.format must be a string.');
 	}
@@ -35,6 +36,7 @@ datetime.prototype.addFilterToQuery = DateType.prototype.addFilterToQuery;
 datetime.prototype.format = DateType.prototype.format;
 datetime.prototype.moment = DateType.prototype.moment;
 datetime.prototype.parse = DateType.prototype.parse;
+datetime.prototype.tz = DateType.prototype.tz;
 
 /**
  * Get the value from a data object; may be simple or a pair of fields
@@ -45,6 +47,19 @@ datetime.prototype.getInputFromData = function(data) {
 	} else {
 		return data[this.path];
 	}
+};
+
+/**
+ * Gets an attached '_timezone' value
+ * Used by DatetimeField to send back what timezone information it was using for correct parsing on the server (which may be in a different timezone)
+ */
+datetime.prototype.timezoneGuess = function(value, parseFormats, data, defaultMoment) {
+    var timezonePath = this.path + '_timezone';
+    if (!(timezonePath in data)) return defaultMoment();
+    
+    var timezoneGuess = data[timezonePath];
+    
+    return moment.tz(value, parseFormats, timezoneGuess).utc();
 };
 
 /**
@@ -70,8 +85,12 @@ datetime.prototype.updateItem = function(item, data) {
 	if (!(this.path in data || (this.paths.date in data && this.paths.time in data))) {
 		return;
 	}
-	var m = this.isUTC ? moment.utc : moment;
-	var newValue = m(this.getInputFromData(data), parseFormats);
+    
+    var rawValue = this.getInputFromData(data);
+    var defaultMoment = function() { return moment(rawValue, parseFormats); };
+    
+    var newValue = this.isUTC ? this.timezoneGuess(rawValue, parseFormats, data, defaultMoment) : defaultMoment();
+     
 	if (newValue.isValid()) {
 		if (!item.get(this.path) || !newValue.isSame(item.get(this.path))) {
 			item.set(this.path, newValue.toDate());
