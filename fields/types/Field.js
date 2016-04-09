@@ -53,7 +53,7 @@ var Base = module.exports.Base = {
 	},
 	
 	renderField: function() {
-		return <input type="text" ref="focusTarget" name={this.props.path} placeholder={this.props.placeholder} value={this.props.value} onChange={this.valueChanged} autoComplete="off" className="form-control" />;
+		return <input type="text" ref="focusTarget" name={this.props.path} placeholder={this.props.placeholder} value={this.props.value} onChange={this.valueChanged} className="form-control" />;
 	},
 	
 	renderValue: function() {
