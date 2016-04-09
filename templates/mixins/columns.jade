@@ -60,7 +60,7 @@ mixin column_boolean(value)
 
 mixin column_datetime(value, item, col)
 	if (col.field.isUTC)
-		div.col-value= col.field.tz(item).format(col.field.formatString)
+		div.col-value= col.field.tz(item, 'Canada/Pacific').format(col.field.formatString)
 	else
 		div.col-value= value
 
