@@ -121,7 +121,7 @@ date.prototype.validateInput = function(data, required, item) {
  * Updates the value for this field in the item from a data object
  */
 date.prototype.updateItem = function(item, data) {
-	if (!(this.path in data)) {
+	if (!(this.path in data || data[this.path])) {
 		return;
 	}
 	var m = this.isUTC ? moment.utc : moment;

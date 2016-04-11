@@ -82,7 +82,7 @@ datetime.prototype.validateInput = function(data, required, item) {
  * Updates the value for this field in the item from a data object
  */
 datetime.prototype.updateItem = function(item, data) {
-	if (!(this.path in data || (this.paths.date in data && this.paths.time in data))) {
+	if (!(this.path in data || data[this.path] || (this.paths.date in data && this.paths.time in data))) {
 		return;
 	}
     
