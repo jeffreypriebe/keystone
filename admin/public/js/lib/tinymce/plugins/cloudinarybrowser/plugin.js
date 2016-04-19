@@ -45,8 +45,9 @@ var pluginFunction = function (pluginType) {
 		
 		
 				var content = editor.getContent();
-				content = content.replace(new RegExp("(.*?<img.+?id=[\"']" + id + "[\"'].*?src=[\"'])[^\"']+(\".*)", "gi"), "$1" + url + "$2");
-				editor.setContent(content, { format: "raw" });
+				var replace = new RegExp("(<img.+?id=[\"']" + id + "[\"'].*?src=[\"'])[^\"']+([\"'])", "gi");
+				content = content.replace(replace, "$1" + url + "$2");
+				editor.setContent(content);
 			});
 	
 		//Open plugin window
