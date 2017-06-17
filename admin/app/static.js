@@ -75,8 +75,12 @@ var lessOptions = {
 };
 
 /* Configure router */
-router.use('/styles', less(__dirname + '../../public/styles', lessOptions));
-router.use(express.static(__dirname + '../../public'));
+// router.use('/styles', less(__dirname + '../../public/styles', lessOptions));
+console.log(__dirname + '../../public/styles');
+console.info(path.resolve(__dirname + '/../public/styles'));
+router.use('/styles', less(path.resolve(__dirname + '/../public/styles'), lessOptions));
+// router.use(express.static(__dirname + '../../public'));
+router.use(express.static(path.resolve(__dirname + '/../public')));
 /* TinyMCE plugin Skins */
 router.use('/js/lib/tinymce/skins', less(__dirname + '/../public/js/lib/tinymce/skins', lessOptions));
 router.use('/js/lib/tinymce/skins/', express.static(__dirname + '/../public/js/lib/tinymce/skins'));
