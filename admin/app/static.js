@@ -18,7 +18,7 @@ var router = express.Router();
 
 var mapPlugin = function(file, pluckNameReg) {
 	var nameMatch = pluckNameReg.exec(file);
-	if (!nameMatch) throw new Error('Unexpected name format for TinyMCE plugin ' + file); 
+	if (!nameMatch) throw new Error('Unexpected name format for TinyMCE plugin ' + file);
 	return {
 		file: path.relative(__dirname, file).replace(/\\/g, '/'),
 		fileRoot: '/' + path.relative(__dirname + '/../', file).replace(/\\/g, '/'),
@@ -49,7 +49,7 @@ var bundles = {
 	fields: browserify('fields.js', 'FieldTypes'),
 	home: browserify('views/home.js'),
 	item: browserify('views/item.js'),
-	list: browserify('views/list.js')	
+	list: browserify('views/list.js')
 };
 tinyReactPlugins.forEach(function(p) { bundles[p.name] = browserify(p.file); });
 
@@ -76,8 +76,6 @@ var lessOptions = {
 
 /* Configure router */
 // router.use('/styles', less(__dirname + '../../public/styles', lessOptions));
-console.log(__dirname + '../../public/styles');
-console.info(path.resolve(__dirname + '/../public/styles'));
 router.use('/styles', less(path.resolve(__dirname + '/../public/styles'), lessOptions));
 // router.use(express.static(__dirname + '../../public'));
 router.use(express.static(path.resolve(__dirname + '/../public')));
@@ -100,7 +98,7 @@ tinyPlugins.forEach(function(p) {
 		router.get(p.pathRootNoPublic + 'images/', minify());
 		router.use(p.pathRootNoPublic + 'images/' + p.filename + '.min.js', express.static(path.resolve(__dirname + '/' + p.file)));
 		router.get(p.pathRootNoPublic + 'files/', minify());
-		router.use(p.pathRootNoPublic + 'files/' + p.filename + '.min.js', express.static(path.resolve(__dirname + '/' + p.file)));		
+		router.use(p.pathRootNoPublic + 'files/' + p.filename + '.min.js', express.static(path.resolve(__dirname + '/' + p.file)));
 	}
 });
 tinyReactPlugins.forEach(function(p) {
