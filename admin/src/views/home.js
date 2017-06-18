@@ -1,11 +1,11 @@
 var React = require('react');
 
 var View = React.createClass({
-	
+
 	displayName: 'HomeView',
-	
+
 	renderFlatNav: function() {
-		return Keystone.lists.map((list) => {			
+		return Keystone.lists.map((list) => {
 			var href = list.external ? list.path : '/keystone/' + list.path;
 			return (
 				<h3 key={list.path}>
@@ -36,9 +36,7 @@ var View = React.createClass({
 						</div>
 					);
 				})}
-				{() => {
-					if (!Keystone.orphanedLists.length) return;
-					return (
+				{Keystone.orphanedLists.length > 0 && (
 						<div className="nav-section">
 							<h4>Other</h4>
 							<ul>
@@ -51,8 +49,8 @@ var View = React.createClass({
 								})}
 							</ul>
 						</div>
-					);
-				}()}
+					)
+				}
 			</div>
 		);
 	},
@@ -65,7 +63,7 @@ var View = React.createClass({
 			</div>
 		);
 	}
-	
+
 });
 
 React.render(<View />, document.getElementById('home-view'));

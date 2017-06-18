@@ -54,7 +54,7 @@ module.exports = function(file, name, addOpts) {
 		}
 		b.transform(babelify.configure({
 			//ignore: ['**/lib/**'],
-			plugins: [require('babel-plugin-object-assign')]
+			plugins: [require('babel-plugin-transform-object-assign')]
 		}));
 		b.exclude('FieldTypes');
 		packages.forEach(function(i) {
