@@ -82,8 +82,9 @@ router.use(express.static(path.resolve(__dirname + '/../public')));
 /* TinyMCE plugin Skins */
 router.use('/js/lib/tinymce/skins', less(__dirname + '/../public/js/lib/tinymce/skins', lessOptions));
 router.use('/js/lib/tinymce/skins/', express.static(__dirname + '/../public/js/lib/tinymce/skins'));
-router.use('/styles/elemental', less(__dirname + '/../../node_modules/elemental/less', lessOptions));
-router.use('/styles/elemental/', express.static(__dirname + '/../../node_modules/elemental/less'));
+const elementalLessPath = path.join(__dirname, '../../../', 'elemental/less')
+router.use('/styles/elemental', less(elementalLessPath, lessOptions));
+router.use('/styles/elemental/', express.static(elementalLessPath));
 router.use('/public/images/', express.static(__dirname + '/../../node_modules/elemental/public/images'));
 router.get('/js/fields.js', bundles.fields.serve);
 router.get('/js/home.js', bundles.home.serve);
